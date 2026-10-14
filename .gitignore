@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# PyInstaller & Compiler build outputs
+build/
+dist/
+installer_output/
+*.spec.bak
+
+# Local application data and SQLite databases
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# Environment & IDE
+.venv/
+venv/
+ENV/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Inno Setup output
+Output/
+_iscc_temp/
