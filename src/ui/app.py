@@ -362,11 +362,15 @@ class DocxDatabaseApp(ctk.CTk):
             height=42,
             font=ctk.CTkFont(family="Segoe UI", size=13),
             fg_color="#07090e",
+            text_color="#ffffff",
+            placeholder_text_color="#64748b",
             border_color="#1e2638",
             corner_radius=8
         )
         self.search_entry.grid(row=0, column=0, sticky="ew")
         self.search_entry.bind("<KeyRelease>", self._on_search_key_release)
+        self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.configure(border_color="#38bdf8"))
+        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color="#1e2638"))
 
         # Clear button [×]
         self.btn_clear = ctk.CTkButton(
@@ -706,6 +710,10 @@ class DocxDatabaseApp(ctk.CTk):
         theme_str = choice.lower()
         self.config.theme = theme_str
         ctk.set_appearance_mode(theme_str)
+        try:
+            self.search_entry.configure(text_color="#ffffff", placeholder_text_color="#64748b")
+        except Exception:
+            pass
 
     def _step_rgb_lights(self):
         if not getattr(self, "_rgb_running", False) or not self.winfo_exists():
