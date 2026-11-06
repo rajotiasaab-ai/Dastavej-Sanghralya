@@ -1,5 +1,5 @@
-"""Retro Design Document Inspector / Preview Pane for Dastavej Sanghralya.
-Grey window frame, navy title bar, raised keys, and white inset reading well.
+"""Document Inspector / Preview Pane for Dastavej Sanghralya.
+Supports Glassy (inspired by Spicetify Glassy / iOS Flow), Retro, Dark, and Light themes.
 """
 
 import os
@@ -10,6 +10,7 @@ from typing import Optional, Dict, Any
 import customtkinter as ctk
 from tkinter import messagebox
 from src.ui.spinner import LoadingSpinner
+from src.ui.theme import get_theme
 
 def format_file_size(size_bytes: int) -> str:
     if size_bytes < 1024:
@@ -27,13 +28,14 @@ def format_timestamp(ts: float) -> str:
         return "Unknown"
 
 class PreviewPane(ctk.CTkFrame):
-    """Right-side Document Inspector pane with Retro desktop styling."""
+    """Right-side Document Inspector pane with dynamic theme awareness."""
 
-    def __init__(self, parent, **kwargs):
-        kwargs.setdefault("fg_color", "#d4d4d4")
-        kwargs.setdefault("border_width", 2)
-        kwargs.setdefault("border_color", "#808080")
-        kwargs.setdefault("corner_radius", 0)
+    def __init__(self, parent, theme: Optional[Dict[str, Any]] = None, **kwargs):
+        self.theme = theme or getattr(parent, "theme", None) or get_theme("glassy")
+        kwargs.setdefault("fg_color", self.theme["preview_bg"])
+        kwargs.setdefault("border_width", self.theme["border_width"])
+        kwargs.setdefault("border_color", self.theme["preview_border"])
+        kwargs.setdefault("corner_radius", self.theme["corner_radius"])
         super().__init__(parent, **kwargs)
         self.current_doc: Optional[Dict[str, Any]] = None
         self._load_token = 0
@@ -41,15 +43,19 @@ class PreviewPane(ctk.CTkFrame):
         self.show_placeholder()
 
     def _build_ui(self):
-        # Retro Window Title Bar
-        self.preview_titlebar = ctk.CTkFrame(self, fg_color="#000080", corner_radius=0, height=24)
+        t = self.theme
+        radius = t.get("corner_radius", 12)
+        btn_rad = 8 if radius > 0 else 0
+
+        # Window Title Bar
+        self.preview_titlebar = ctk.CTkFrame(self, fg_color=t["titlebar_bg"], corner_radius=radius, height=24)
         self.preview_titlebar.pack(fill="x", padx=2, pady=(2, 6))
 
         self.preview_title_lbl = ctk.CTkLabel(
             self.preview_titlebar,
-            text="📄 DOCUMENT PREVIEW INSPECTOR",
+            text=f"{t.get('titlebar_icon', '📄')} DOCUMENT PREVIEW INSPECTOR",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#ffffff"
+            text_color=t["titlebar_fg"]
         )
         self.preview_title_lbl.pack(side="left", padx=6, pady=2)
 
@@ -61,16 +67,16 @@ class PreviewPane(ctk.CTkFrame):
         title_row = ctk.CTkFrame(self.header_frame, fg_color="transparent")
         title_row.pack(fill="x")
 
-        # DOCX Badge (Retro Highlight Yellow Chip)
+        # DOCX Badge
         self.icon_badge = ctk.CTkLabel(
             title_row,
             text=" 📄 DOCX ",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            fg_color="#ffff00",
+            fg_color=t["card_badge_bg"],
             border_width=1,
-            border_color="#808080",
-            text_color="#000000",
-            corner_radius=0,
+            border_color=t["card_badge_border"],
+            text_color=t["card_badge_fg"],
+            corner_radius=4 if radius > 0 else 0,
             height=20
         )
         self.icon_badge.pack(side="left", padx=(0, 6))
@@ -79,7 +85,7 @@ class PreviewPane(ctk.CTkFrame):
             title_row,
             text="",
             font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
-            text_color="#000000",
+            text_color=t["preview_title_fg"],
             anchor="w"
         )
         self.filename_label.pack(side="left", fill="x", expand=True)
@@ -88,26 +94,26 @@ class PreviewPane(ctk.CTkFrame):
             self.header_frame,
             text="",
             font=ctk.CTkFont(family="Segoe UI", size=10),
-            text_color="#555555",
+            text_color=t["preview_path_fg"],
             anchor="w"
         )
         self.path_label.pack(fill="x", pady=(2, 8))
 
-        # Action Buttons Bar (Raised 3D Retro Keys)
+        # Action Buttons Bar
         self.actions_frame = ctk.CTkFrame(self.header_frame, fg_color="transparent")
         self.actions_frame.pack(fill="x", pady=(0, 8))
 
         self.btn_open_word = ctk.CTkButton(
             self.actions_frame,
             text="🚀 Open in Word",
-            fg_color="#000080",
-            hover_color="#0000a0",
-            border_width=2,
-            border_color="#808080",
-            text_color="#ffffff",
+            fg_color=t["btn_primary_bg"],
+            hover_color=t["btn_primary_hover"],
+            border_width=t["border_width"],
+            border_color=t["btn_primary_border"],
+            text_color=t["btn_primary_fg"],
             height=30,
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            corner_radius=0,
+            corner_radius=btn_rad,
             command=self._on_open_in_word
         )
         self.btn_open_word.pack(side="left", padx=(0, 6))
@@ -115,14 +121,14 @@ class PreviewPane(ctk.CTkFrame):
         self.btn_reveal = ctk.CTkButton(
             self.actions_frame,
             text="📂 Reveal in Folder",
-            fg_color="#d4d4d4",
-            hover_color="#e0e0e0",
-            border_width=2,
-            border_color="#808080",
-            text_color="#000000",
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_width=t["border_width"],
+            border_color=t["btn_secondary_border"],
+            text_color=t["btn_secondary_fg"],
             height=30,
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            corner_radius=0,
+            corner_radius=btn_rad,
             command=self._on_reveal_in_explorer
         )
         self.btn_reveal.pack(side="left", padx=(0, 6))
@@ -130,25 +136,25 @@ class PreviewPane(ctk.CTkFrame):
         self.btn_copy_path = ctk.CTkButton(
             self.actions_frame,
             text="📋 Copy Path",
-            fg_color="#d4d4d4",
-            hover_color="#e0e0e0",
-            border_width=2,
-            border_color="#808080",
-            text_color="#000000",
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_width=t["border_width"],
+            border_color=t["btn_secondary_border"],
+            text_color=t["btn_secondary_fg"],
             height=30,
             font=ctk.CTkFont(family="Segoe UI", size=11),
-            corner_radius=0,
+            corner_radius=btn_rad,
             command=self._on_copy_path
         )
         self.btn_copy_path.pack(side="left")
 
-        # Metadata Strip (White Inset Well)
+        # Metadata Strip
         self.meta_frame = ctk.CTkFrame(
             self.header_frame,
-            fg_color="#ffffff",
+            fg_color=t["preview_meta_bg"],
             border_width=1,
-            border_color="#808080",
-            corner_radius=0
+            border_color=t["preview_meta_border"],
+            corner_radius=btn_rad
         )
         self.meta_frame.pack(fill="x", pady=(0, 6))
 
@@ -156,7 +162,7 @@ class PreviewPane(ctk.CTkFrame):
             self.meta_frame,
             text="",
             font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
-            text_color="#000000",
+            text_color=t["preview_meta_fg"],
             anchor="w",
             padx=10,
             pady=6
@@ -168,35 +174,105 @@ class PreviewPane(ctk.CTkFrame):
             self,
             text="DOCUMENT CONTENT READING WELL",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#000080",
+            text_color=t.get("subbrand_fg", t["titlebar_bg"]),
             anchor="w"
         )
         self.content_title_label.pack(fill="x", padx=12, pady=(4, 2))
 
-        # Processing Circle (Retro Spinner)
+        # Processing Circle
         self.spinner = LoadingSpinner(
             self,
             size=44,
             ring_width=4,
-            ring_color="#000080",
-            track_color="#d4d4d4",
+            ring_color=t["spinner_ring"],
+            track_color=t["spinner_track"],
             text="Retrieving document content...",
             text_size=11,
-            bg_color="#ffffff"
+            bg_color=t["spinner_bg"]
         )
 
-        # Editor-Style Text Preview Box (White Inset Reading Well)
+        # Editor-Style Text Preview Box
         self.text_preview = ctk.CTkTextbox(
             self,
             wrap="word",
             font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=11),
-            fg_color="#ffffff",
-            text_color="#000000",
-            border_width=2,
-            border_color="#808080",
-            corner_radius=0
+            fg_color=t["preview_text_bg"],
+            text_color=t["preview_text_fg"],
+            border_width=t["border_width"],
+            border_color=t["preview_text_border"],
+            corner_radius=btn_rad
         )
-        self.text_preview.tag_config("match_hl", background="#ffff00", foreground="#000000")
+        self.text_preview.tag_config("match_hl", background=t["preview_match_hl"], foreground=t["preview_match_hl_fg"])
+
+    def apply_theme(self, theme: Dict[str, Any]):
+        self.theme = theme
+        t = self.theme
+        radius = t.get("corner_radius", 12)
+        btn_rad = 8 if radius > 0 else 0
+
+        self.configure(
+            fg_color=t["preview_bg"],
+            border_color=t["preview_border"],
+            border_width=t["border_width"],
+            corner_radius=radius
+        )
+        self.preview_titlebar.configure(fg_color=t["titlebar_bg"], corner_radius=radius)
+        self.preview_title_lbl.configure(
+            text=f"{t.get('titlebar_icon', '📄')} DOCUMENT PREVIEW INSPECTOR",
+            text_color=t["titlebar_fg"]
+        )
+        self.icon_badge.configure(
+            fg_color=t["card_badge_bg"],
+            text_color=t["card_badge_fg"],
+            border_color=t["card_badge_border"],
+            corner_radius=4 if radius > 0 else 0
+        )
+        self.filename_label.configure(text_color=t["preview_title_fg"])
+        self.path_label.configure(text_color=t["preview_path_fg"])
+
+        self.btn_open_word.configure(
+            fg_color=t["btn_primary_bg"],
+            hover_color=t["btn_primary_hover"],
+            border_color=t["btn_primary_border"],
+            border_width=t["border_width"],
+            text_color=t["btn_primary_fg"],
+            corner_radius=btn_rad
+        )
+        self.btn_reveal.configure(
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_color=t["btn_secondary_border"],
+            border_width=t["border_width"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=btn_rad
+        )
+        self.btn_copy_path.configure(
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_color=t["btn_secondary_border"],
+            border_width=t["border_width"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=btn_rad
+        )
+
+        self.meta_frame.configure(
+            fg_color=t["preview_meta_bg"],
+            border_color=t["preview_meta_border"],
+            corner_radius=btn_rad
+        )
+        self.meta_info_label.configure(text_color=t["preview_meta_fg"])
+        self.content_title_label.configure(text_color=t.get("subbrand_fg", t["titlebar_bg"]))
+
+        self.spinner.apply_theme(t)
+
+        self.text_preview.configure(
+            fg_color=t["preview_text_bg"],
+            text_color=t["preview_text_fg"],
+            border_color=t["preview_text_border"],
+            border_width=t["border_width"],
+            corner_radius=btn_rad
+        )
+        self.text_preview.tag_config("match_hl", background=t["preview_match_hl"], foreground=t["preview_match_hl_fg"])
 
     def show_placeholder(self):
         """Displays empty state when no document is selected."""
@@ -205,8 +281,8 @@ class PreviewPane(ctk.CTkFrame):
         self.spinner.pack_forget()
         self.current_doc = None
         self.icon_badge.pack_forget()
-        self.filename_label.configure(text="No Document Selected")
-        self.path_label.configure(text="Select any document from the results to inspect content.")
+        self.filename_label.configure(text="No Document Selected", text_color=self.theme["preview_title_fg"])
+        self.path_label.configure(text="Select any document from the results to inspect content.", text_color=self.theme["preview_path_fg"])
         self.actions_frame.pack_forget()
         self.meta_frame.pack_forget()
         self.content_title_label.pack_forget()
@@ -216,8 +292,8 @@ class PreviewPane(ctk.CTkFrame):
         """Displays processing circle instead of full document text."""
         self._load_token += 1
         self.icon_badge.pack(side="left", padx=(0, 6))
-        self.filename_label.configure(text=filename)
-        self.path_label.configure(text="Retrieving document content...")
+        self.filename_label.configure(text=filename, text_color=self.theme["preview_title_fg"])
+        self.path_label.configure(text="Retrieving document content...", text_color=self.theme["preview_path_fg"])
         self.actions_frame.pack_forget()
         self.meta_frame.pack_forget()
         self.content_title_label.pack(fill="x", padx=12, pady=(4, 2))
@@ -246,8 +322,8 @@ class PreviewPane(ctk.CTkFrame):
         author = doc_data.get("author", "")
         title = doc_data.get("title", "")
 
-        self.filename_label.configure(text=filename)
-        self.path_label.configure(text=path_str)
+        self.filename_label.configure(text=filename, text_color=self.theme["preview_title_fg"])
+        self.path_label.configure(text=path_str, text_color=self.theme["preview_path_fg"])
 
         meta_parts = [
             f"📊 Words: {words:,}",
@@ -344,89 +420,8 @@ class PreviewPane(ctk.CTkFrame):
         self.clipboard_append(path_str)
         orig_text = self.btn_copy_path.cget("text")
         self.btn_copy_path.configure(text="✓ Copied!", fg_color="#008000", text_color="#ffffff")
-        self.after(1500, lambda: self.btn_copy_path.configure(text=orig_text, fg_color="#d4d4d4", text_color="#000000"))
-
-        # Show Processing Circle first
-        self.text_preview.pack_forget()
-        self.spinner.set_text("Rendering document preview...")
-        self.spinner.pack(fill="both", expand=True, pady=30)
-        self.spinner.start()
-
-        # Asynchronously render text content in next tick so the UI does not freeze
-        self.after(35, lambda: self._render_text_content(current_token, doc_data, search_term))
-
-    def _render_text_content(self, token: int, doc_data: Dict[str, Any], search_term: str):
-        if token != self._load_token:
-            return
-
-        content = doc_data.get("content", "").strip()
-        if not content:
-            content = "(This document contains no readable text or is empty)"
-
-        max_chars = 60000
-        if len(content) > max_chars:
-            content = content[:max_chars] + "\n\n... [Preview truncated for performance. Click 'Open in Word' to view full document.]"
-
-        self.text_preview.configure(state="normal")
-        self.text_preview.delete("1.0", "end")
-        self.text_preview.insert("1.0", content)
-
-        if search_term and search_term.strip():
-            self._highlight_matches(search_term.strip(), max_matches=40)
-
-        self.text_preview.configure(state="disabled")
-
-        # Hide spinner and show text
-        self.spinner.stop()
-        self.spinner.pack_forget()
-        self.text_preview.pack(fill="both", expand=True, padx=16, pady=(0, 16))
-
-    def _highlight_matches(self, term: str, max_matches: int = 40):
-        query_words = [w for w in term.replace('"', '').split() if len(w) > 1]
-        matches_found = 0
-        for word in query_words:
-            start_pos = "1.0"
-            while matches_found < max_matches:
-                pos = self.text_preview.search(word, start_pos, stopindex="end", nocase=True)
-                if not pos:
-                    break
-                end_pos = f"{pos}+{len(word)}c"
-                self.text_preview.tag_add("match_hl", pos, end_pos)
-                start_pos = end_pos
-                matches_found += 1
-
-    def _on_open_in_word(self):
-        if not self.current_doc:
-            return
-        path_str = self.current_doc.get("path", "")
-        if not Path(path_str).exists():
-            messagebox.showerror("File Not Found", f"The file no longer exists at:\n{path_str}", parent=self)
-            return
-
-        try:
-            os.startfile(path_str)
-        except Exception as e:
-            messagebox.showerror("Error Opening File", f"Could not launch file:\n{e}", parent=self)
-
-    def _on_reveal_in_explorer(self):
-        if not self.current_doc:
-            return
-        path_str = self.current_doc.get("path", "")
-        if not Path(path_str).exists():
-            messagebox.showerror("File Not Found", f"The file no longer exists at:\n{path_str}", parent=self)
-            return
-
-        try:
-            subprocess.Popen(f'explorer /select,"{os.path.normpath(path_str)}"')
-        except Exception as e:
-            messagebox.showerror("Error", f"Could not open File Explorer:\n{e}", parent=self)
-
-    def _on_copy_path(self):
-        if not self.current_doc:
-            return
-        path_str = self.current_doc.get("path", "")
-        self.clipboard_clear()
-        self.clipboard_append(path_str)
-        orig_text = self.btn_copy_path.cget("text")
-        self.btn_copy_path.configure(text="✓ Copied!", fg_color="#059669")
-        self.after(1500, lambda: self.btn_copy_path.configure(text=orig_text, fg_color="#131c2e"))
+        self.after(1500, lambda: self.btn_copy_path.configure(
+            text=orig_text,
+            fg_color=self.theme["btn_secondary_bg"],
+            text_color=self.theme["btn_secondary_fg"]
+        ))

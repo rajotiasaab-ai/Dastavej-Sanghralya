@@ -99,6 +99,23 @@ class LoadingSpinner(ctk.CTkFrame):
                 bg = "#ffffff"
             self.canvas.configure(bg=bg)
             self.canvas.itemconfig(self.track_arc, outline=self.track_color)
+            self.canvas.itemconfig(self.spinner_arc, outline=self.ring_color)
+        except Exception:
+            pass
+
+    def apply_theme(self, t: dict):
+        self.ring_color = t.get("spinner_ring", "#e8b847")
+        self.track_color = t.get("spinner_track", "#2a2018")
+        self._custom_bg = t.get("spinner_bg", "#140e0a")
+        glow_color = t.get("spinner_glow", "#f3c95e")
+        text_color = t.get("spinner_text", "#cfc3ac")
+        try:
+            self.canvas.configure(bg=self._custom_bg)
+            self.canvas.itemconfig(self.track_arc, outline=self.track_color)
+            self.canvas.itemconfig(self.spinner_arc, outline=self.ring_color)
+            self.canvas.itemconfig(self.glow_arc, outline=glow_color)
+            if self.lbl_text:
+                self.lbl_text.configure(text_color=text_color)
         except Exception:
             pass
 
