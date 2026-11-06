@@ -37,14 +37,14 @@ class DocxDatabaseApp(ctk.CTk):
         self.scanner = DirectoryScanner(self.db)
         self.watcher = DocxWatcher(self.db, on_change=self._on_file_changed)
 
-        # 2. Window Configurations & Hard Aesthetic Theme
-        ctk.set_appearance_mode(self.config.theme)
+        # 2. Window Configurations & Retro Computing Theme
+        ctk.set_appearance_mode("light")
         ctk.set_default_color_theme("blue")
 
         self.title("Dastavej Sanghralya - Developed by Anoop Kumar")
         self.geometry("1320x840")
         self.minsize(1020, 640)
-        self.configure(fg_color="#070a13")
+        self.configure(fg_color="#008080")
 
         # Set Window Icon
         icon_candidates = [
@@ -101,7 +101,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_layout(self):
-        self.grid_columnconfigure(0, weight=0, minsize=260)
+        self.grid_columnconfigure(0, weight=0, minsize=280)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
@@ -111,42 +111,54 @@ class DocxDatabaseApp(ctk.CTk):
     def _build_sidebar(self):
         self.sidebar = ctk.CTkFrame(
             self,
-            width=270,
+            width=280,
             corner_radius=0,
-            fg_color="#0a0f1d",
-            border_width=1,
-            border_color="#152033"
+            fg_color="#d4d4d4",
+            border_width=2,
+            border_color="#808080"
         )
-        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
-        self.sidebar.grid_rowconfigure(8, weight=1)
+        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=(6, 3), pady=6)
+        self.sidebar.grid_rowconfigure(9, weight=1)
+
+        # Retro Window Title Bar
+        sb_titlebar = ctk.CTkFrame(self.sidebar, fg_color="#000080", corner_radius=0, height=24)
+        sb_titlebar.grid(row=0, column=0, sticky="ew", padx=2, pady=(2, 6))
+
+        sb_title_lbl = ctk.CTkLabel(
+            sb_titlebar,
+            text="💾 DASTAVEJ CONTROL PANEL",
+            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            text_color="#ffffff"
+        )
+        sb_title_lbl.pack(side="left", padx=6, pady=2)
 
         # App Brand Header
         brand_frame = ctk.CTkFrame(self.sidebar, fg_color="transparent")
-        brand_frame.grid(row=0, column=0, padx=20, pady=(24, 6), sticky="ew")
+        brand_frame.grid(row=1, column=0, padx=14, pady=(6, 4), sticky="ew")
 
         brand_lbl = ctk.CTkLabel(
             brand_frame,
             text="📑 DASTAVEJ",
-            font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
-            text_color="#ffffff"
+            font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
+            text_color="#000000"
         )
         brand_lbl.pack(anchor="w")
 
         sub_brand_lbl = ctk.CTkLabel(
             brand_frame,
-            text="दस्तावेज़ संग्रहालय • Offline Hub",
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            text_color="#38bdf8"
+            text="दस्तावेज़ संग्रहालय • Offline Word Hub",
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            text_color="#000080"
         )
         sub_brand_lbl.pack(anchor="w", pady=(1, 0))
 
-        # RGB Developer Credit with Animated Addressable RGB Lights
+        # RGB Developer Credit with Animated Addressable RGB Lights (Beveled Inset Display)
         self.rgb_badge = ctk.CTkFrame(
             brand_frame,
-            fg_color="#0d1527",
-            border_width=1,
-            border_color="#38bdf8",
-            corner_radius=12
+            fg_color="#000000",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
         )
         self.rgb_badge.pack(anchor="w", pady=(8, 0))
 
@@ -160,7 +172,7 @@ class DocxDatabaseApp(ctk.CTk):
                 self.rgb_led_strip,
                 text="●",
                 font=ctk.CTkFont(family="Segoe UI", size=8, weight="bold"),
-                text_color="#38bdf8",
+                text_color="#ffff00",
                 width=10
             )
             dot.pack(side="left", padx=1)
@@ -170,288 +182,318 @@ class DocxDatabaseApp(ctk.CTk):
             self.rgb_badge,
             text="Developed by Anoop Kumar",
             font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
-            text_color="#f1f5f9"
+            text_color="#ffffff"
         )
         self.rgb_dev_lbl.pack(side="left", padx=(2, 10), pady=4)
 
-        # Real-Time Engine Status Pill (iOS Glass Capsule)
+        # Real-Time Engine Status Inset Well
         self.status_pill = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#05241e" if self.config.auto_watch else "#0e1628",
-            border_width=1,
-            border_color="#059669" if self.config.auto_watch else "#1e2c45",
-            corner_radius=12
+            fg_color="#ffffff",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
         )
-        self.status_pill.grid(row=1, column=0, padx=20, pady=(8, 14), sticky="ew")
+        self.status_pill.grid(row=2, column=0, padx=14, pady=(8, 10), sticky="ew")
 
         self.status_pill_lbl = ctk.CTkLabel(
             self.status_pill,
             text="● LIVE SYNC ACTIVE" if self.config.auto_watch else "○ LIVE SYNC OFF",
             font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
-            text_color="#6ee7b7" if self.config.auto_watch else "#94a3b8",
-            padx=10,
-            pady=4
+            text_color="#006600" if self.config.auto_watch else "#808080",
+            padx=8,
+            pady=3
         )
         self.status_pill_lbl.pack(anchor="w")
 
-        # Stats Card (Frosted Glass Container)
+        # Stats Card (White Inset Reading Well)
         self.stats_card = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#0e172a",
-            border_width=1,
-            border_color="#1c2b44",
-            corner_radius=14
+            fg_color="#ffffff",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
         )
-        self.stats_card.grid(row=2, column=0, padx=16, pady=4, sticky="ew")
+        self.stats_card.grid(row=3, column=0, padx=14, pady=4, sticky="ew")
 
         stats_hdr = ctk.CTkLabel(
             self.stats_card,
             text="INDEX METRICS",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#64748b"
+            text_color="#808080"
         )
-        stats_hdr.pack(anchor="w", padx=14, pady=(10, 2))
+        stats_hdr.pack(anchor="w", padx=12, pady=(8, 2))
 
         self.lbl_stat_docs = ctk.CTkLabel(
             self.stats_card,
             text="0 Documents",
             font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
-            text_color="#ffffff",
+            text_color="#000000",
             anchor="w"
         )
-        self.lbl_stat_docs.pack(fill="x", padx=14, pady=(0, 2))
+        self.lbl_stat_docs.pack(fill="x", padx=12, pady=(0, 2))
 
         self.lbl_stat_words = ctk.CTkLabel(
             self.stats_card,
             text="0 total indexed words",
             font=ctk.CTkFont(family="Segoe UI", size=11),
-            text_color="#94a3b8",
+            text_color="#000080",
             anchor="w"
         )
-        self.lbl_stat_words.pack(fill="x", padx=14, pady=(0, 12))
+        self.lbl_stat_words.pack(fill="x", padx=12, pady=(0, 10))
 
-        # Flow Action Buttons
+        # Raised 3D Bevel Keys
         self.btn_rescan = ctk.CTkButton(
             self.sidebar,
             text="🔄 Rescan Folders",
-            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
-            height=38,
-            fg_color="#0284c7",
-            hover_color="#0369a1",
-            border_width=1,
-            border_color="#38bdf8",
-            text_color="#ffffff",
-            corner_radius=12,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            height=34,
+            fg_color="#d4d4d4",
+            hover_color="#e6e6e6",
+            border_width=2,
+            border_color="#808080",
+            text_color="#000000",
+            corner_radius=0,
             command=self._start_manual_scan
         )
-        self.btn_rescan.grid(row=3, column=0, padx=16, pady=(16, 6), sticky="ew")
+        self.btn_rescan.grid(row=4, column=0, padx=14, pady=(12, 5), sticky="ew")
 
         self.btn_folders = ctk.CTkButton(
             self.sidebar,
-            text="📁 Monitored Folders",
-            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
-            height=36,
-            fg_color="#121b2f",
-            hover_color="#1b2844",
-            border_width=1,
-            border_color="#223354",
-            text_color="#cbd5e1",
-            corner_radius=12,
+            text="📁 Monitored Folders...",
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            height=34,
+            fg_color="#d4d4d4",
+            hover_color="#e6e6e6",
+            border_width=2,
+            border_color="#808080",
+            text_color="#000000",
+            corner_radius=0,
             command=self._open_folder_dialog
         )
-        self.btn_folders.grid(row=4, column=0, padx=16, pady=6, sticky="ew")
+        self.btn_folders.grid(row=5, column=0, padx=14, pady=5, sticky="ew")
 
         # Auto-watch switch
         self.switch_watch = ctk.CTkSwitch(
             self.sidebar,
             text="Real-time Auto Sync",
             font=ctk.CTkFont(family="Segoe UI", size=11),
-            text_color="#cbd5e1",
-            progress_color="#0284c7",
+            text_color="#000000",
+            progress_color="#000080",
             command=self._on_toggle_auto_watch
         )
-        self.switch_watch.grid(row=5, column=0, padx=20, pady=(14, 5), sticky="w")
+        self.switch_watch.grid(row=6, column=0, padx=18, pady=(10, 4), sticky="w")
         if self.config.auto_watch:
             self.switch_watch.select()
         else:
             self.switch_watch.deselect()
 
-        # Keyboard Shortcuts Hint (Translucent Glass Card)
+        # Keyboard Shortcuts (White Inset Reading Well)
         shortcuts_frame = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#0e1628",
-            border_width=1,
-            border_color="#18253c",
-            corner_radius=12
+            fg_color="#ffffff",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
         )
-        self.sidebar.grid_rowconfigure(7, weight=1)
-        shortcuts_frame.grid(row=7, column=0, padx=16, pady=(20, 10), sticky="ew")
+        self.sidebar.grid_rowconfigure(8, weight=1)
+        shortcuts_frame.grid(row=8, column=0, padx=14, pady=(12, 8), sticky="ew")
 
         sc_title = ctk.CTkLabel(
             shortcuts_frame,
             text="KEYBOARD SHORTCUTS",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#64748b"
+            text_color="#808080"
         )
-        sc_title.pack(anchor="w", padx=10, pady=(8, 2))
+        sc_title.pack(anchor="w", padx=10, pady=(6, 2))
 
         sc_list = ctk.CTkLabel(
             shortcuts_frame,
             text="[Ctrl + F]  Focus Search\n[Esc]       Clear Search\n[Enter]     Open in Word\n[↑ / ↓]     Navigate Cards",
             font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=10),
-            text_color="#94a3b8",
+            text_color="#000000",
             justify="left",
             anchor="w"
         )
-        sc_list.pack(anchor="w", padx=10, pady=(0, 8))
+        sc_list.pack(anchor="w", padx=10, pady=(0, 6))
 
         # Bottom Theme selector
         theme_lbl = ctk.CTkLabel(
             self.sidebar,
-            text="THEME MODE:",
+            text="APPEARANCE:",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#64748b"
+            text_color="#808080"
         )
-        theme_lbl.grid(row=9, column=0, padx=20, pady=(0, 2), sticky="w")
+        theme_lbl.grid(row=10, column=0, padx=16, pady=(0, 2), sticky="w")
 
         self.theme_menu = ctk.CTkOptionMenu(
             self.sidebar,
-            values=["Dark", "Light", "System"],
+            values=["Light", "Dark", "System"],
             command=self._on_change_theme,
-            fg_color="#121b2f",
-            button_color="#1b2844",
-            button_hover_color="#26385d",
-            dropdown_fg_color="#0e1526",
-            dropdown_hover_color="#182742",
-            dropdown_text_color="#ffffff",
-            text_color="#cbd5e1",
-            height=30,
-            corner_radius=10
+            fg_color="#d4d4d4",
+            button_color="#d4d4d4",
+            button_hover_color="#e0e0e0",
+            dropdown_fg_color="#ffffff",
+            dropdown_hover_color="#e0e0e0",
+            dropdown_text_color="#000000",
+            text_color="#000000",
+            height=28,
+            corner_radius=0
         )
-        self.theme_menu.grid(row=10, column=0, padx=16, pady=(0, 10), sticky="ew")
-        self.theme_menu.set(self.config.theme.capitalize())
+        self.theme_menu.grid(row=11, column=0, padx=14, pady=(0, 8), sticky="ew")
+        self.theme_menu.set("Retro Light")
 
         # Offline Engine Status
         engine_lbl = ctk.CTkLabel(
             self.sidebar,
             text="🔒 100% Offline Local Engine",
             font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
-            text_color="#475569"
+            text_color="#000000"
         )
-        engine_lbl.grid(row=11, column=0, padx=20, pady=(0, 16), sticky="w")
+        engine_lbl.grid(row=12, column=0, padx=16, pady=(0, 12), sticky="w")
 
     def _build_main_content(self):
-        self.main_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.main_frame.grid(row=0, column=1, sticky="nsew", padx=20, pady=18)
+        # Framed Main Window on Teal Desktop
+        self.main_frame = ctk.CTkFrame(
+            self,
+            fg_color="#d4d4d4",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
+        )
+        self.main_frame.grid(row=0, column=1, sticky="nsew", padx=(3, 6), pady=6)
         self.main_frame.grid_columnconfigure(0, weight=6)
         self.main_frame.grid_columnconfigure(1, weight=4)
-        self.main_frame.grid_rowconfigure(2, weight=1)
+        self.main_frame.grid_rowconfigure(3, weight=1)
 
-        # 1. Search Bar Command Center (Floating Frosted Glass Bar)
+        # Window Title Bar (Deep Navy with White Text)
+        main_titlebar = ctk.CTkFrame(self.main_frame, fg_color="#000080", corner_radius=0, height=24)
+        main_titlebar.grid(row=0, column=0, columnspan=2, sticky="ew", padx=2, pady=(2, 6))
+
+        main_title_lbl = ctk.CTkLabel(
+            main_titlebar,
+            text="📑 DASTAVEJ SANGHRALYA - DOCUMENT ARCHIVE EXPLORER",
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            text_color="#ffffff"
+        )
+        main_title_lbl.pack(side="left", padx=8, pady=2)
+
+        # 1. Search Bar Command Center (Grey Frame)
         search_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#0d1424",
+            fg_color="#d4d4d4",
             border_width=1,
-            border_color="#1d2b44",
-            corner_radius=16
+            border_color="#808080",
+            corner_radius=0
         )
-        search_frame.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
+        search_frame.grid(row=1, column=0, columnspan=2, sticky="ew", padx=8, pady=(0, 6))
         search_frame.grid_columnconfigure(0, weight=1)
 
         # Input container with clear button
         input_container = ctk.CTkFrame(search_frame, fg_color="transparent")
-        input_container.grid(row=0, column=0, sticky="ew", padx=(12, 8), pady=8)
+        input_container.grid(row=0, column=0, sticky="ew", padx=(6, 4), pady=6)
         input_container.grid_columnconfigure(0, weight=1)
 
+        # White Inset Reading Well for Search Entry (100% visible black text!)
         self.search_entry = ctk.CTkEntry(
             input_container,
             placeholder_text="🔍 Search document name or content (e.g. invoice, contract, budget)...",
-            height=42,
-            font=ctk.CTkFont(family="Segoe UI", size=13),
-            fg_color="#080d1a",
-            text_color="#ffffff",
-            placeholder_text_color="#64748b",
-            border_width=1,
-            border_color="#18253c",
-            corner_radius=12
+            height=36,
+            font=ctk.CTkFont(family="Segoe UI", size=12),
+            fg_color="#ffffff",
+            text_color="#000000",
+            placeholder_text_color="#808080",
+            border_width=2,
+            border_color="#808080",
+            corner_radius=0
         )
         self.search_entry.grid(row=0, column=0, sticky="ew")
         self.search_entry.bind("<KeyRelease>", self._on_search_key_release)
-        self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.configure(border_color="#38bdf8"))
-        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color="#18253c"))
+        self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.configure(border_color="#000080"))
+        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color="#808080"))
 
-        # Clear button [×] (Translucent round glass bubble)
+        # Clear button [×] (Raised 3D Bevel Key)
         self.btn_clear = ctk.CTkButton(
             input_container,
             text="✕",
             width=28,
             height=28,
-            fg_color="#152136",
-            hover_color="#233555",
-            text_color="#94a3b8",
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            corner_radius=14,
+            fg_color="#d4d4d4",
+            hover_color="#e0e0e0",
+            border_width=2,
+            border_color="#808080",
+            text_color="#000000",
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            corner_radius=0,
             command=self._clear_search
         )
-        self.btn_clear.grid(row=0, column=1, padx=(6, 0))
+        self.btn_clear.grid(row=0, column=1, padx=(4, 0))
 
-        # Scope Segmented Filter Tabs (Transparent iOS Tabs)
+        # Scope Segmented Filter Tabs (Classic Bevel Tabs)
         self.scope_segment = ctk.CTkSegmentedButton(
             search_frame,
             values=["⚡ All Fields", "🏷️ Title Only", "📄 Inside Content"],
             command=self._on_scope_chip_changed,
-            height=36,
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            fg_color="#090e1c",
-            selected_color="#0284c7",
-            selected_hover_color="#0369a1",
-            unselected_color="#0e1526",
-            unselected_hover_color="#17243e",
+            height=32,
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            fg_color="#d4d4d4",
+            selected_color="#000080",
+            selected_hover_color="#0000aa",
+            unselected_color="#d4d4d4",
+            unselected_hover_color="#e6e6e6",
             text_color="#ffffff",
-            corner_radius=12
+            corner_radius=0
         )
-        self.scope_segment.grid(row=0, column=1, sticky="e", padx=(0, 8), pady=8)
+        self.scope_segment.grid(row=0, column=1, sticky="e", padx=(0, 6), pady=6)
         self.scope_segment.set("⚡ All Fields")
 
-        # Sort Menu (Translucent Glass Dropdown)
+        # Sort Menu (Classic Grey Dropdown)
         self.sort_menu = ctk.CTkOptionMenu(
             search_frame,
             values=["🎯 Best Match", "🕒 Recent", "🔤 By Name", "📦 By Size"],
             command=self._on_sort_chip_changed,
-            height=36,
-            width=128,
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            fg_color="#0e1526",
-            button_color="#16233a",
-            button_hover_color="#233555",
-            dropdown_fg_color="#0e1526",
-            dropdown_hover_color="#182742",
-            dropdown_text_color="#ffffff",
-            text_color="#cbd5e1",
-            corner_radius=10
+            height=32,
+            width=125,
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            fg_color="#d4d4d4",
+            button_color="#d4d4d4",
+            button_hover_color="#e0e0e0",
+            dropdown_fg_color="#ffffff",
+            dropdown_hover_color="#e0e0e0",
+            dropdown_text_color="#000000",
+            text_color="#000000",
+            corner_radius=0
         )
-        self.sort_menu.grid(row=0, column=2, sticky="e", padx=(0, 12), pady=8)
+        self.sort_menu.grid(row=0, column=2, sticky="e", padx=(0, 8), pady=6)
         self.sort_menu.set("🎯 Best Match")
 
-        # 2. Status & Progress bar
-        status_bar_frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
-        status_bar_frame.grid(row=1, column=0, columnspan=2, sticky="ew", pady=(0, 8))
+        # 2. Status & Progress bar (Inset Reading Strip)
+        status_bar_frame = ctk.CTkFrame(
+            self.main_frame,
+            fg_color="#ffffff",
+            border_width=1,
+            border_color="#808080",
+            corner_radius=0
+        )
+        status_bar_frame.grid(row=2, column=0, columnspan=2, sticky="ew", padx=8, pady=(0, 6))
 
         self.status_lbl = ctk.CTkLabel(
             status_bar_frame,
             text="Ready • Type to search documents",
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            text_color="#94a3b8",
-            anchor="w"
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            text_color="#000000",
+            anchor="w",
+            padx=8,
+            pady=3
         )
         self.status_lbl.pack(side="left")
 
         self.scan_progress = ctk.CTkProgressBar(
             status_bar_frame,
             height=4,
-            width=220,
-            progress_color="#0284c7",
-            fg_color="#141e30"
+            width=200,
+            progress_color="#000080",
+            fg_color="#d4d4d4"
         )
         self.scan_progress.set(0)
 
@@ -460,21 +502,21 @@ class DocxDatabaseApp(ctk.CTk):
             self.main_frame,
             on_doc_selected=self._on_select_document,
             on_doc_open=self._on_open_document,
-            fg_color="#0a0f1d",
-            border_color="#162236",
-            border_width=1,
-            corner_radius=16
+            fg_color="#ffffff",
+            border_color="#808080",
+            border_width=2,
+            corner_radius=0
         )
-        self.results_view.grid(row=2, column=0, sticky="nsew", padx=(0, 10))
+        self.results_view.grid(row=3, column=0, sticky="nsew", padx=(8, 4), pady=(0, 8))
 
         self.preview_pane = PreviewPane(
             self.main_frame,
-            fg_color="#0a0f1d",
-            border_color="#162236",
-            border_width=1,
-            corner_radius=16
+            fg_color="#d4d4d4",
+            border_color="#808080",
+            border_width=2,
+            corner_radius=0
         )
-        self.preview_pane.grid(row=2, column=1, sticky="nsew", padx=(10, 0))
+        self.preview_pane.grid(row=3, column=1, sticky="nsew", padx=(4, 8), pady=(0, 8))
 
     def _bind_keyboard_shortcuts(self):
         """Binds intuitive keyboard navigation for frictionless operation."""
@@ -711,12 +753,12 @@ class DocxDatabaseApp(ctk.CTk):
         self.config.auto_watch = val
         if val:
             self.watcher.start(self.config.monitored_folders)
-            self.status_pill.configure(fg_color="#064e3b", border_color="#059669")
-            self.status_pill_lbl.configure(text="● LIVE SYNC ACTIVE", text_color="#6ee7b7")
+            self.status_pill.configure(fg_color="#ffffff", border_color="#808080")
+            self.status_pill_lbl.configure(text="● LIVE SYNC ACTIVE", text_color="#006600")
         else:
             self.watcher.stop()
-            self.status_pill.configure(fg_color="#1e293b", border_color="#334155")
-            self.status_pill_lbl.configure(text="○ LIVE SYNC OFF", text_color="#94a3b8")
+            self.status_pill.configure(fg_color="#d4d4d4", border_color="#808080")
+            self.status_pill_lbl.configure(text="○ LIVE SYNC OFF", text_color="#808080")
 
     def _open_folder_dialog(self):
         FolderManagerDialog(self, self.config, on_folders_changed=self._on_folders_updated)
@@ -731,7 +773,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.config.theme = theme_str
         ctk.set_appearance_mode(theme_str)
         try:
-            self.search_entry.configure(text_color="#ffffff", placeholder_text_color="#64748b")
+            self.search_entry.configure(text_color="#000000", placeholder_text_color="#808080")
         except Exception:
             pass
 

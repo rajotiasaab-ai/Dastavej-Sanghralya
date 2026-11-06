@@ -1,23 +1,23 @@
-"""Futuristic glowing circular loading spinner widget for Dastavej Sanghralya.
-Renders a smooth rotating neon arc on a Canvas. 100% offline, lightweight.
+"""Retro styled circular loading spinner widget for Dastavej Sanghralya.
+Renders a smooth rotating arc on a Canvas. 100% offline, lightweight.
 """
 
 import tkinter as tk
 import customtkinter as ctk
 
 class LoadingSpinner(ctk.CTkFrame):
-    """Futuristic rotating neon circular spinner with smooth animation."""
+    """Rotating circular spinner with smooth animation and retro styling."""
 
     def __init__(
         self,
         parent,
         size: int = 44,
         ring_width: int = 4,
-        ring_color: str = "#00d2ff",       # Electric Cyan / Neon Blue
-        track_color: str = "#182030",      # Deep dark track
+        ring_color: str = "#000080",       # Retro Navy
+        track_color: str = "#d4d4d4",      # Retro Window Grey
         text: str = "",
-        text_size: int = 12,
-        bg_color: str = "transparent",
+        text_size: int = 11,
+        bg_color: str = "#ffffff",         # Inset Well White
         **kwargs
     ):
         super().__init__(parent, fg_color="transparent", **kwargs)
@@ -58,17 +58,17 @@ class LoadingSpinner(ctk.CTkFrame):
             style="arc"
         )
 
-        # Glowing outer glow arc (subtle)
+        # Subtle secondary arc (Highlight Yellow)
         self.glow_arc = self.canvas.create_arc(
             self.box,
             start=0,
             extent=90,
-            outline="#1d4ed8",
-            width=ring_width + 2,
+            outline="#ffff00",
+            width=ring_width,
             style="arc"
         )
 
-        # Foreground neon spinner arc
+        # Foreground spinner arc (Navy)
         self.spinner_arc = self.canvas.create_arc(
             self.box,
             start=0,
@@ -85,7 +85,7 @@ class LoadingSpinner(ctk.CTkFrame):
                 self.center_frame,
                 text=text,
                 font=ctk.CTkFont(family="Segoe UI", size=text_size, weight="bold"),
-                text_color="#94a3b8"
+                text_color="#000000"
             )
             self.lbl_text.pack()
 
@@ -93,15 +93,12 @@ class LoadingSpinner(ctk.CTkFrame):
 
     def _update_canvas_bg(self):
         try:
-            mode = ctk.get_appearance_mode()
             if self._custom_bg != "transparent":
                 bg = self._custom_bg
             else:
-                bg = "#0f131a" if mode == "Dark" else "#f1f5f9"
+                bg = "#ffffff"
             self.canvas.configure(bg=bg)
-            
-            t_col = "#1e293b" if mode == "Dark" else "#cbd5e1"
-            self.canvas.itemconfig(self.track_arc, outline=t_col)
+            self.canvas.itemconfig(self.track_arc, outline=self.track_color)
         except Exception:
             pass
 
