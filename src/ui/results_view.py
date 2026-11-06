@@ -27,7 +27,7 @@ def format_timestamp(ts: float) -> str:
         return "Unknown"
 
 class ResultCard(ctk.CTkFrame):
-    """Hard Aesthetic Document Card with dark glass styling and glowing accents."""
+    """iOS Glassy Flow Document Card with frosted glass surface and responsive hover flow."""
 
     def __init__(
         self,
@@ -38,11 +38,13 @@ class ResultCard(ctk.CTkFrame):
         is_selected: bool = False,
         **kwargs
     ):
-        super().__init__(parent, corner_radius=10, **kwargs)
+        kwargs.setdefault("corner_radius", 14)
+        super().__init__(parent, **kwargs)
         self.doc_data = doc_data
         self.on_select = on_select
         self.on_open = on_open
         self.is_selected = is_selected
+        self._is_hovered = False
 
         self._apply_theme_colors()
         self._build_ui()
@@ -51,20 +53,36 @@ class ResultCard(ctk.CTkFrame):
     def _apply_theme_colors(self):
         if self.is_selected:
             self.configure(
-                fg_color="#152136",             # Electric Blue Tint
-                border_width=2,
+                fg_color="#142340",             # Active Sapphire Glass
+                border_width=1.5,
                 border_color="#38bdf8"           # Neon Sky Blue Glow
+            )
+        elif self._is_hovered:
+            self.configure(
+                fg_color="#121d33",             # Hover Frosted Highlight
+                border_width=1,
+                border_color="#2b3e60"           # Light Specular Glass Rim
             )
         else:
             self.configure(
-                fg_color="#121620",             # Deep Obsidian Slate
+                fg_color="#0e1526",             # Deep Frosted Glass
                 border_width=1,
-                border_color="#1e2536"           # Dark Cyber Border
+                border_color="#1a273e"           # Subtle Specular Glass Edge
             )
 
     def set_selected(self, selected: bool):
         self.is_selected = selected
         self._apply_theme_colors()
+
+    def _on_hover_enter(self, event=None):
+        if not self.is_selected:
+            self._is_hovered = True
+            self._apply_theme_colors()
+
+    def _on_hover_leave(self, event=None):
+        if not self.is_selected:
+            self._is_hovered = False
+            self._apply_theme_colors()
 
     def _build_ui(self):
         filename = self.doc_data.get("filename", "Untitled.docx")
@@ -78,14 +96,16 @@ class ResultCard(ctk.CTkFrame):
         top_row = ctk.CTkFrame(self, fg_color="transparent")
         top_row.pack(fill="x", padx=14, pady=(10, 2))
 
-        # DOCX badge
+        # DOCX badge (Translucent iOS Glass Chip)
         ext_badge = ctk.CTkLabel(
             top_row,
             text=" DOCX ",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
-            fg_color="#1e293b",
+            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            fg_color="#182742",
+            border_width=1,
+            border_color="#253c66",
             text_color="#38bdf8",
-            corner_radius=4,
+            corner_radius=6,
             height=20
         )
         ext_badge.pack(side="left", padx=(0, 8))
@@ -95,16 +115,16 @@ class ResultCard(ctk.CTkFrame):
             top_row,
             text=filename,
             font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
-            text_color="#f8fafc",
+            text_color="#ffffff",
             anchor="w"
         )
         title_lbl.pack(side="left", fill="x", expand=True)
 
-        # Metrics Chip
+        # Metrics Chip (Frosted Pill)
         meta_chip = ctk.CTkLabel(
             top_row,
             text=f"📊 {words:,}w  •  💾 {file_size}  •  🕒 {mtime}",
-            font=ctk.CTkFont(family="Segoe UI", size=11),
+            font=ctk.CTkFont(family="Segoe UI", size=10),
             text_color="#94a3b8"
         )
         meta_chip.pack(side="right")
@@ -126,10 +146,10 @@ class ResultCard(ctk.CTkFrame):
         if snippet:
             snippet_container = ctk.CTkFrame(
                 self,
-                fg_color="#0a0d14",
+                fg_color="#080c16",
                 border_width=1,
-                border_color="#1a202c",
-                corner_radius=6
+                border_color="#162032",
+                corner_radius=8
             )
             snippet_container.pack(fill="x", padx=14, pady=(4, 10))
 
@@ -155,13 +175,21 @@ class ResultCard(ctk.CTkFrame):
         self.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
         self.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
 
-        # Propagate click to children
+        # Hover flow bindings
+        self.bind("<Enter>", self._on_hover_enter)
+        self.bind("<Leave>", self._on_hover_leave)
+
+        # Propagate click & hover to children
         for child in self.winfo_children():
             child.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
             child.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
+            child.bind("<Enter>", self._on_hover_enter)
+            child.bind("<Leave>", self._on_hover_leave)
             for sub in child.winfo_children():
                 sub.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
                 sub.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
+                sub.bind("<Enter>", self._on_hover_enter)
+                sub.bind("<Leave>", self._on_hover_leave)
 
         # Right-click context menu
         self.bind("<Button-3>", self._show_context_menu)
@@ -169,7 +197,7 @@ class ResultCard(ctk.CTkFrame):
             child.bind("<Button-3>", self._show_context_menu)
 
     def _show_context_menu(self, event):
-        menu = Menu(self, tearoff=0, bg="#121620", fg="#f8fafc", activebackground="#38bdf8", activeforeground="#000000")
+        menu = Menu(self, tearoff=0, bg="#0e1526", fg="#ffffff", activebackground="#0284c7", activeforeground="#ffffff")
         menu.add_command(label="🚀 Open in Word", command=lambda: self.on_open(self.doc_data))
         menu.add_command(label="📂 Show in File Explorer", command=self._reveal_in_explorer)
         menu.add_command(label="📋 Copy Path", command=self._copy_path)
@@ -196,10 +224,10 @@ class ResultsView(ctk.CTkScrollableFrame):
         on_doc_open: Callable[[Dict[str, Any]], None],
         **kwargs
     ):
-        kwargs.setdefault("fg_color", "#0a0d14")
+        kwargs.setdefault("fg_color", "#0a0f1d")
         kwargs.setdefault("border_width", 1)
-        kwargs.setdefault("border_color", "#182030")
-        kwargs.setdefault("corner_radius", 12)
+        kwargs.setdefault("border_color", "#162236")
+        kwargs.setdefault("corner_radius", 16)
         super().__init__(parent, **kwargs)
         self.on_doc_selected = on_doc_selected
         self.on_doc_open = on_doc_open
@@ -214,7 +242,7 @@ class ResultsView(ctk.CTkScrollableFrame):
             ring_color="#00d2ff",
             text="Searching repository in background...",
             text_size=12,
-            bg_color="#0a0d14"
+            bg_color="#0a0f1d"
         )
         self.is_loading = False
 

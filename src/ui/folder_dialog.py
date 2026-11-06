@@ -7,7 +7,7 @@ from typing import Callable, List
 from src.config import ConfigManager
 
 class FolderManagerDialog(ctk.CTkToplevel):
-    """Modal dialog allowing users to add/remove monitored folders with dark aesthetic styling."""
+    """Modal dialog allowing users to add/remove monitored folders with iOS Glassy Flow styling."""
 
     def __init__(self, parent, config: ConfigManager, on_folders_changed: Callable[[List[str]], None]):
         super().__init__(parent)
@@ -17,7 +17,7 @@ class FolderManagerDialog(ctk.CTkToplevel):
         self.title("Monitored Folders - Dastavej Sanghralya")
         self.geometry("620x460")
         self.resizable(False, False)
-        self.configure(fg_color="#0a0d14")
+        self.configure(fg_color="#090e1a")
         
         self.transient(parent)
         self.grab_set()
@@ -34,7 +34,7 @@ class FolderManagerDialog(ctk.CTkToplevel):
             header_frame,
             text="📁 Monitored Directories",
             font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
-            text_color="#f8fafc"
+            text_color="#ffffff"
         )
         title_lbl.pack(anchor="w")
 
@@ -46,30 +46,32 @@ class FolderManagerDialog(ctk.CTkToplevel):
         )
         sub_lbl.pack(anchor="w", pady=(3, 0))
 
-        # Scrollable list of folders
+        # Scrollable list of folders (Frosted Glass Container)
         self.list_frame = ctk.CTkScrollableFrame(
             self,
-            fg_color="#0d111a",
+            fg_color="#0c1322",
             border_width=1,
-            border_color="#182030",
-            corner_radius=10,
+            border_color="#18243a",
+            corner_radius=14,
             height=260
         )
         self.list_frame.pack(fill="both", expand=True, padx=24, pady=10)
 
-        # Bottom Button Bar
+        # Bottom Button Bar (iOS Flow Buttons)
         btn_frame = ctk.CTkFrame(self, fg_color="transparent")
         btn_frame.pack(fill="x", padx=24, pady=(5, 20))
 
         add_btn = ctk.CTkButton(
             btn_frame,
             text="＋ Add Monitored Folder",
-            fg_color="#2563eb",
-            hover_color="#1d4ed8",
+            fg_color="#0284c7",
+            hover_color="#0369a1",
+            border_width=1,
+            border_color="#38bdf8",
             text_color="#ffffff",
             font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             height=36,
-            corner_radius=6,
+            corner_radius=10,
             command=self._on_add_folder
         )
         add_btn.pack(side="left")
@@ -77,13 +79,15 @@ class FolderManagerDialog(ctk.CTkToplevel):
         close_btn = ctk.CTkButton(
             btn_frame,
             text="Close",
-            fg_color="#1e293b",
-            hover_color="#334155",
+            fg_color="#131c2e",
+            hover_color="#1e2c46",
+            border_width=1,
+            border_color="#243654",
             text_color="#cbd5e1",
             font=ctk.CTkFont(family="Segoe UI", size=12),
             height=36,
             width=90,
-            corner_radius=6,
+            corner_radius=10,
             command=self.destroy
         )
         close_btn.pack(side="right")
@@ -106,10 +110,10 @@ class FolderManagerDialog(ctk.CTkToplevel):
         for folder_path in folders:
             item_card = ctk.CTkFrame(
                 self.list_frame,
-                fg_color="#121622",
+                fg_color="#101828",
                 border_width=1,
-                border_color="#1e2638",
-                corner_radius=8
+                border_color="#1d2b44",
+                corner_radius=10
             )
             item_card.pack(fill="x", pady=4, padx=4)
 
@@ -128,13 +132,15 @@ class FolderManagerDialog(ctk.CTkToplevel):
             del_btn = ctk.CTkButton(
                 item_card,
                 text="Remove",
-                width=72,
+                width=76,
                 height=26,
-                fg_color="#450a0a",
-                hover_color="#7f1d1d",
+                fg_color="#30151c",
+                hover_color="#4c1d28",
+                border_width=1,
+                border_color="#7f1d1d",
                 text_color="#fca5a5",
                 font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-                corner_radius=4,
+                corner_radius=8,
                 command=lambda p=folder_path: self._on_remove_folder(p)
             )
             del_btn.pack(side="right", padx=10, pady=8)

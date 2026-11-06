@@ -27,13 +27,13 @@ def format_timestamp(ts: float) -> str:
         return "Unknown"
 
 class PreviewPane(ctk.CTkFrame):
-    """Right-side Document Inspector pane with hard aesthetic styling."""
+    """Right-side Document Inspector pane with iOS Glassy Flow styling."""
 
     def __init__(self, parent, **kwargs):
-        kwargs.setdefault("fg_color", "#0a0d14")
+        kwargs.setdefault("fg_color", "#0a0f1d")
         kwargs.setdefault("border_width", 1)
-        kwargs.setdefault("border_color", "#182030")
-        kwargs.setdefault("corner_radius", 12)
+        kwargs.setdefault("border_color", "#162236")
+        kwargs.setdefault("corner_radius", 16)
         super().__init__(parent, **kwargs)
         self.current_doc: Optional[Dict[str, Any]] = None
         self._load_token = 0
@@ -49,13 +49,16 @@ class PreviewPane(ctk.CTkFrame):
         title_row = ctk.CTkFrame(self.header_frame, fg_color="transparent")
         title_row.pack(fill="x")
 
+        # DOCX Badge (Translucent iOS Glass Chip)
         self.icon_badge = ctk.CTkLabel(
             title_row,
             text=" 📄 DOCX ",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
-            fg_color="#1e293b",
+            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            fg_color="#182742",
+            border_width=1,
+            border_color="#253c66",
             text_color="#38bdf8",
-            corner_radius=4,
+            corner_radius=6,
             height=20
         )
         self.icon_badge.pack(side="left", padx=(0, 8))
@@ -64,7 +67,7 @@ class PreviewPane(ctk.CTkFrame):
             title_row,
             text="",
             font=ctk.CTkFont(family="Segoe UI", size=15, weight="bold"),
-            text_color="#f8fafc",
+            text_color="#ffffff",
             anchor="w"
         )
         self.filename_label.pack(side="left", fill="x", expand=True)
@@ -78,19 +81,21 @@ class PreviewPane(ctk.CTkFrame):
         )
         self.path_label.pack(fill="x", pady=(2, 10))
 
-        # Action Buttons Bar
+        # Action Buttons Bar (iOS Flow Buttons)
         self.actions_frame = ctk.CTkFrame(self.header_frame, fg_color="transparent")
         self.actions_frame.pack(fill="x", pady=(0, 10))
 
         self.btn_open_word = ctk.CTkButton(
             self.actions_frame,
             text="🚀 Open in Word",
-            fg_color="#2563eb",
-            hover_color="#1d4ed8",
+            fg_color="#0284c7",
+            hover_color="#0369a1",
+            border_width=1,
+            border_color="#38bdf8",
             text_color="#ffffff",
             height=32,
-            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
-            corner_radius=6,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            corner_radius=10,
             command=self._on_open_in_word
         )
         self.btn_open_word.pack(side="left", padx=(0, 8))
@@ -98,12 +103,14 @@ class PreviewPane(ctk.CTkFrame):
         self.btn_reveal = ctk.CTkButton(
             self.actions_frame,
             text="📂 Reveal in Folder",
-            fg_color="#1e293b",
-            hover_color="#334155",
+            fg_color="#131c2e",
+            hover_color="#1e2c46",
+            border_width=1,
+            border_color="#243654",
             text_color="#cbd5e1",
             height=32,
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            corner_radius=6,
+            corner_radius=10,
             command=self._on_reveal_in_explorer
         )
         self.btn_reveal.pack(side="left", padx=(0, 8))
@@ -111,23 +118,25 @@ class PreviewPane(ctk.CTkFrame):
         self.btn_copy_path = ctk.CTkButton(
             self.actions_frame,
             text="📋 Copy Path",
-            fg_color="#1e293b",
-            hover_color="#334155",
+            fg_color="#131c2e",
+            hover_color="#1e2c46",
+            border_width=1,
+            border_color="#243654",
             text_color="#cbd5e1",
             height=32,
             font=ctk.CTkFont(family="Segoe UI", size=11),
-            corner_radius=6,
+            corner_radius=10,
             command=self._on_copy_path
         )
         self.btn_copy_path.pack(side="left")
 
-        # Metadata Chips Strip
+        # Metadata Chips Strip (Translucent Glass Strip)
         self.meta_frame = ctk.CTkFrame(
             self.header_frame,
-            fg_color="#111622",
+            fg_color="#0c1220",
             border_width=1,
-            border_color="#1e2536",
-            corner_radius=8
+            border_color="#18243a",
+            corner_radius=10
         )
         self.meta_frame.pack(fill="x", pady=(0, 8))
 
@@ -146,7 +155,7 @@ class PreviewPane(ctk.CTkFrame):
         self.content_title_label = ctk.CTkLabel(
             self,
             text="CONTENT STREAM PREVIEW",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
             text_color="#64748b",
             anchor="w"
         )
@@ -160,21 +169,21 @@ class PreviewPane(ctk.CTkFrame):
             ring_color="#00d2ff",
             text="Decrypting and streaming text...",
             text_size=12,
-            bg_color="#0a0d14"
+            bg_color="#0a0f1d"
         )
 
-        # Editor-Style Text Preview Box
+        # Editor-Style Text Preview Box (Deep Glass Well)
         self.text_preview = ctk.CTkTextbox(
             self,
             wrap="word",
             font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=12),
-            fg_color="#06080d",
+            fg_color="#070a14",
             text_color="#e2e8f0",
             border_width=1,
-            border_color="#182030",
-            corner_radius=8
+            border_color="#162134",
+            corner_radius=10
         )
-        self.text_preview.tag_config("match_hl", background="#ca8a04", foreground="#000000")
+        self.text_preview.tag_config("match_hl", background="#0369a1", foreground="#ffffff")
 
     def show_placeholder(self):
         """Displays empty state when no document is selected."""
@@ -321,5 +330,5 @@ class PreviewPane(ctk.CTkFrame):
         self.clipboard_clear()
         self.clipboard_append(path_str)
         orig_text = self.btn_copy_path.cget("text")
-        self.btn_copy_path.configure(text="✓ Copied!", fg_color="#10b981")
-        self.after(1500, lambda: self.btn_copy_path.configure(text=orig_text, fg_color="#1e293b"))
+        self.btn_copy_path.configure(text="✓ Copied!", fg_color="#059669")
+        self.after(1500, lambda: self.btn_copy_path.configure(text=orig_text, fg_color="#131c2e"))

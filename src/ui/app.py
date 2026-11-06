@@ -44,7 +44,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.title("Dastavej Sanghralya - Developed by Anoop Kumar")
         self.geometry("1320x840")
         self.minsize(1020, 640)
-        self.configure(fg_color="#07090e")
+        self.configure(fg_color="#070a13")
 
         # Set Window Icon
         icon_candidates = [
@@ -111,11 +111,11 @@ class DocxDatabaseApp(ctk.CTk):
     def _build_sidebar(self):
         self.sidebar = ctk.CTkFrame(
             self,
-            width=260,
+            width=270,
             corner_radius=0,
-            fg_color="#0f121a",
+            fg_color="#0a0f1d",
             border_width=1,
-            border_color="#182030"
+            border_color="#152033"
         )
         self.sidebar.grid(row=0, column=0, sticky="nsew", padx=0, pady=0)
         self.sidebar.grid_rowconfigure(8, weight=1)
@@ -128,7 +128,7 @@ class DocxDatabaseApp(ctk.CTk):
             brand_frame,
             text="📑 DASTAVEJ",
             font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
-            text_color="#f8fafc"
+            text_color="#ffffff"
         )
         brand_lbl.pack(anchor="w")
 
@@ -143,10 +143,10 @@ class DocxDatabaseApp(ctk.CTk):
         # RGB Developer Credit with Animated Addressable RGB Lights
         self.rgb_badge = ctk.CTkFrame(
             brand_frame,
-            fg_color="#090d16",
+            fg_color="#0d1527",
             border_width=1,
             border_color="#38bdf8",
-            corner_radius=8
+            corner_radius=12
         )
         self.rgb_badge.pack(anchor="w", pady=(8, 0))
 
@@ -174,13 +174,13 @@ class DocxDatabaseApp(ctk.CTk):
         )
         self.rgb_dev_lbl.pack(side="left", padx=(2, 10), pady=4)
 
-        # Real-Time Engine Status Pill
+        # Real-Time Engine Status Pill (iOS Glass Capsule)
         self.status_pill = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#064e3b" if self.config.auto_watch else "#1e293b",
+            fg_color="#05241e" if self.config.auto_watch else "#0e1628",
             border_width=1,
-            border_color="#059669" if self.config.auto_watch else "#334155",
-            corner_radius=6
+            border_color="#059669" if self.config.auto_watch else "#1e2c45",
+            corner_radius=12
         )
         self.status_pill.grid(row=1, column=0, padx=20, pady=(8, 14), sticky="ew")
 
@@ -194,13 +194,13 @@ class DocxDatabaseApp(ctk.CTk):
         )
         self.status_pill_lbl.pack(anchor="w")
 
-        # Stats Card (Glowing metrics container)
+        # Stats Card (Frosted Glass Container)
         self.stats_card = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#141824",
+            fg_color="#0e172a",
             border_width=1,
-            border_color="#1f2638",
-            corner_radius=10
+            border_color="#1c2b44",
+            corner_radius=14
         )
         self.stats_card.grid(row=2, column=0, padx=16, pady=4, sticky="ew")
 
@@ -216,7 +216,7 @@ class DocxDatabaseApp(ctk.CTk):
             self.stats_card,
             text="0 Documents",
             font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
-            text_color="#f8fafc",
+            text_color="#ffffff",
             anchor="w"
         )
         self.lbl_stat_docs.pack(fill="x", padx=14, pady=(0, 2))
@@ -230,16 +230,18 @@ class DocxDatabaseApp(ctk.CTk):
         )
         self.lbl_stat_words.pack(fill="x", padx=14, pady=(0, 12))
 
-        # Action Buttons
+        # Flow Action Buttons
         self.btn_rescan = ctk.CTkButton(
             self.sidebar,
             text="🔄 Rescan Folders",
             font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             height=38,
-            fg_color="#2563eb",
-            hover_color="#1d4ed8",
+            fg_color="#0284c7",
+            hover_color="#0369a1",
+            border_width=1,
+            border_color="#38bdf8",
             text_color="#ffffff",
-            corner_radius=8,
+            corner_radius=12,
             command=self._start_manual_scan
         )
         self.btn_rescan.grid(row=3, column=0, padx=16, pady=(16, 6), sticky="ew")
@@ -249,10 +251,12 @@ class DocxDatabaseApp(ctk.CTk):
             text="📁 Monitored Folders",
             font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             height=36,
-            fg_color="#1e293b",
-            hover_color="#334155",
+            fg_color="#121b2f",
+            hover_color="#1b2844",
+            border_width=1,
+            border_color="#223354",
             text_color="#cbd5e1",
-            corner_radius=8,
+            corner_radius=12,
             command=self._open_folder_dialog
         )
         self.btn_folders.grid(row=4, column=0, padx=16, pady=6, sticky="ew")
@@ -263,7 +267,7 @@ class DocxDatabaseApp(ctk.CTk):
             text="Real-time Auto Sync",
             font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color="#cbd5e1",
-            progress_color="#00d2ff",
+            progress_color="#0284c7",
             command=self._on_toggle_auto_watch
         )
         self.switch_watch.grid(row=5, column=0, padx=20, pady=(14, 5), sticky="w")
@@ -272,13 +276,13 @@ class DocxDatabaseApp(ctk.CTk):
         else:
             self.switch_watch.deselect()
 
-        # Keyboard Shortcuts Hint
+        # Keyboard Shortcuts Hint (Translucent Glass Card)
         shortcuts_frame = ctk.CTkFrame(
             self.sidebar,
-            fg_color="#121622",
+            fg_color="#0e1628",
             border_width=1,
-            border_color="#182030",
-            corner_radius=8
+            border_color="#18253c",
+            corner_radius=12
         )
         self.sidebar.grid_rowconfigure(7, weight=1)
         shortcuts_frame.grid(row=7, column=0, padx=16, pady=(20, 10), sticky="ew")
@@ -314,12 +318,15 @@ class DocxDatabaseApp(ctk.CTk):
             self.sidebar,
             values=["Dark", "Light", "System"],
             command=self._on_change_theme,
-            fg_color="#1e293b",
-            button_color="#27354a",
-            button_hover_color="#334155",
+            fg_color="#121b2f",
+            button_color="#1b2844",
+            button_hover_color="#26385d",
+            dropdown_fg_color="#0e1526",
+            dropdown_hover_color="#182742",
+            dropdown_text_color="#ffffff",
             text_color="#cbd5e1",
-            height=28,
-            corner_radius=6
+            height=30,
+            corner_radius=10
         )
         self.theme_menu.grid(row=10, column=0, padx=16, pady=(0, 10), sticky="ew")
         self.theme_menu.set(self.config.theme.capitalize())
@@ -340,13 +347,13 @@ class DocxDatabaseApp(ctk.CTk):
         self.main_frame.grid_columnconfigure(1, weight=4)
         self.main_frame.grid_rowconfigure(2, weight=1)
 
-        # 1. Search Bar Command Center
+        # 1. Search Bar Command Center (Floating Frosted Glass Bar)
         search_frame = ctk.CTkFrame(
             self.main_frame,
-            fg_color="#0d111a",
+            fg_color="#0d1424",
             border_width=1,
-            border_color="#182030",
-            corner_radius=12
+            border_color="#1d2b44",
+            corner_radius=16
         )
         search_frame.grid(row=0, column=0, columnspan=2, sticky="ew", pady=(0, 10))
         search_frame.grid_columnconfigure(0, weight=1)
@@ -361,25 +368,26 @@ class DocxDatabaseApp(ctk.CTk):
             placeholder_text="🔍 Search document name or content (e.g. invoice, contract, budget)...",
             height=42,
             font=ctk.CTkFont(family="Segoe UI", size=13),
-            fg_color="#07090e",
+            fg_color="#080d1a",
             text_color="#ffffff",
             placeholder_text_color="#64748b",
-            border_color="#1e2638",
-            corner_radius=8
+            border_width=1,
+            border_color="#18253c",
+            corner_radius=12
         )
         self.search_entry.grid(row=0, column=0, sticky="ew")
         self.search_entry.bind("<KeyRelease>", self._on_search_key_release)
         self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.configure(border_color="#38bdf8"))
-        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color="#1e2638"))
+        self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color="#18253c"))
 
-        # Clear button [×]
+        # Clear button [×] (Translucent round glass bubble)
         self.btn_clear = ctk.CTkButton(
             input_container,
             text="✕",
             width=28,
             height=28,
-            fg_color="#1e293b",
-            hover_color="#334155",
+            fg_color="#152136",
+            hover_color="#233555",
             text_color="#94a3b8",
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             corner_radius=14,
@@ -387,36 +395,40 @@ class DocxDatabaseApp(ctk.CTk):
         )
         self.btn_clear.grid(row=0, column=1, padx=(6, 0))
 
-        # Redefined Scope Segmented Filter Chips
+        # Scope Segmented Filter Tabs (Transparent iOS Tabs)
         self.scope_segment = ctk.CTkSegmentedButton(
             search_frame,
             values=["⚡ All Fields", "🏷️ Title Only", "📄 Inside Content"],
             command=self._on_scope_chip_changed,
             height=36,
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            fg_color="#07090e",
-            selected_color="#2563eb",
-            selected_hover_color="#1d4ed8",
-            unselected_color="#121622",
-            unselected_hover_color="#182030",
-            text_color="#cbd5e1"
+            fg_color="#090e1c",
+            selected_color="#0284c7",
+            selected_hover_color="#0369a1",
+            unselected_color="#0e1526",
+            unselected_hover_color="#17243e",
+            text_color="#ffffff",
+            corner_radius=12
         )
         self.scope_segment.grid(row=0, column=1, sticky="e", padx=(0, 8), pady=8)
         self.scope_segment.set("⚡ All Fields")
 
-        # Redefined Sort Menu
+        # Sort Menu (Translucent Glass Dropdown)
         self.sort_menu = ctk.CTkOptionMenu(
             search_frame,
             values=["🎯 Best Match", "🕒 Recent", "🔤 By Name", "📦 By Size"],
             command=self._on_sort_chip_changed,
             height=36,
-            width=125,
+            width=128,
             font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            fg_color="#121622",
-            button_color="#1e293b",
-            button_hover_color="#27354a",
+            fg_color="#0e1526",
+            button_color="#16233a",
+            button_hover_color="#233555",
+            dropdown_fg_color="#0e1526",
+            dropdown_hover_color="#182742",
+            dropdown_text_color="#ffffff",
             text_color="#cbd5e1",
-            corner_radius=8
+            corner_radius=10
         )
         self.sort_menu.grid(row=0, column=2, sticky="e", padx=(0, 12), pady=8)
         self.sort_menu.set("🎯 Best Match")
@@ -438,8 +450,8 @@ class DocxDatabaseApp(ctk.CTk):
             status_bar_frame,
             height=4,
             width=220,
-            progress_color="#00d2ff",
-            fg_color="#182030"
+            progress_color="#0284c7",
+            fg_color="#141e30"
         )
         self.scan_progress.set(0)
 
@@ -447,12 +459,20 @@ class DocxDatabaseApp(ctk.CTk):
         self.results_view = ResultsView(
             self.main_frame,
             on_doc_selected=self._on_select_document,
-            on_doc_open=self._on_open_document
+            on_doc_open=self._on_open_document,
+            fg_color="#0a0f1d",
+            border_color="#162236",
+            border_width=1,
+            corner_radius=16
         )
         self.results_view.grid(row=2, column=0, sticky="nsew", padx=(0, 10))
 
         self.preview_pane = PreviewPane(
-            self.main_frame
+            self.main_frame,
+            fg_color="#0a0f1d",
+            border_color="#162236",
+            border_width=1,
+            corner_radius=16
         )
         self.preview_pane.grid(row=2, column=1, sticky="nsew", padx=(10, 0))
 
