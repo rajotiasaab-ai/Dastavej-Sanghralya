@@ -124,12 +124,12 @@ class ResultCard(ctk.CTkFrame):
         self._apply_theme_colors()
 
     def _on_hover_enter(self, event=None):
-        if not self.is_selected:
+        if not self.is_selected and not self._is_hovered:
             self._is_hovered = True
             self._apply_theme_colors()
 
     def _on_hover_leave(self, event=None):
-        if not self.is_selected:
+        if not self.is_selected and self._is_hovered:
             self._is_hovered = False
             self._apply_theme_colors()
 
@@ -226,26 +226,22 @@ class ResultCard(ctk.CTkFrame):
         self.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
         self.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
 
-        # Hover flow bindings
+        # Card-level hover (smooth, non-redundant)
         self.bind("<Enter>", self._on_hover_enter)
         self.bind("<Leave>", self._on_hover_leave)
 
-        # Propagate click & hover to children
+        # Propagate clicks & context menu to direct children
         for child in self.winfo_children():
             child.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
             child.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
-            child.bind("<Enter>", self._on_hover_enter)
-            child.bind("<Leave>", self._on_hover_leave)
+            child.bind("<Button-3>", self._show_context_menu)
             for sub in child.winfo_children():
                 sub.bind("<Button-1>", lambda e: self.on_select(self.doc_data))
                 sub.bind("<Double-Button-1>", lambda e: self.on_open(self.doc_data))
-                sub.bind("<Enter>", self._on_hover_enter)
-                sub.bind("<Leave>", self._on_hover_leave)
+                sub.bind("<Button-3>", self._show_context_menu)
 
         # Right-click context menu
         self.bind("<Button-3>", self._show_context_menu)
-        for child in self.winfo_children():
-            child.bind("<Button-3>", self._show_context_menu)
 
     def _show_context_menu(self, event):
         t = self.theme
@@ -274,7 +270,9 @@ class ResultCard(ctk.CTkFrame):
 
 
 class ResultsView(ctk.CTkScrollableFrame):
-    """Scrollable list container for ResultCards with LoadingSpinner integration."""
+    """Scrollable list container for ResultCards with fast batched rendering and LoadingSpinner integration."""
+
+    BATCH_SIZE = 25
 
     def __init__(
         self,
@@ -294,6 +292,9 @@ class ResultsView(ctk.CTkScrollableFrame):
         self.on_doc_open = on_doc_open
         self.cards: List[ctk.CTkBaseClass] = []
         self.selected_doc_id: Optional[int] = None
+        self._all_results: List[Dict[str, Any]] = []
+        self._rendered_count = 0
+        self.btn_load_more: Optional[ctk.CTkButton] = None
 
         # Theme-aware Animated Processing Circle
         self.spinner = LoadingSpinner(
@@ -334,19 +335,23 @@ class ResultsView(ctk.CTkScrollableFrame):
         self.spinner.pack_forget()
 
     def _clear_cards(self):
+        self.btn_load_more = None
         for card in self.cards:
             try:
                 card.destroy()
             except Exception:
                 pass
         self.cards.clear()
+        self._rendered_count = 0
 
     def display_results(self, results: List[Dict[str, Any]]):
-        """Renders list of document cards cleanly without freezing."""
+        """Renders list of document cards cleanly and responsively without freezing."""
         self.hide_loading()
         self._clear_cards()
+        self._all_results = results or []
+        self._rendered_count = 0
 
-        if not results:
+        if not self._all_results:
             empty_container = ctk.CTkFrame(self, fg_color="transparent")
             empty_container.pack(expand=True, pady=60)
 
@@ -376,8 +381,24 @@ class ResultsView(ctk.CTkScrollableFrame):
             self.cards.append(empty_container)
             return
 
-        # Render cards
-        for doc in results:
+        # Render first batch instantly without freezing
+        self._render_next_batch()
+
+    def _render_next_batch(self):
+        """Renders the next batch of cards (25 at a time) for blazing-fast 60fps rendering."""
+        if self.btn_load_more and self.btn_load_more.winfo_exists():
+            try:
+                self.cards.remove(self.btn_load_more)
+            except ValueError:
+                pass
+            self.btn_load_more.destroy()
+            self.btn_load_more = None
+
+        start_idx = self._rendered_count
+        end_idx = min(start_idx + self.BATCH_SIZE, len(self._all_results))
+
+        for i in range(start_idx, end_idx):
+            doc = self._all_results[i]
             doc_id = doc.get("id")
             card = ResultCard(
                 self,
@@ -389,6 +410,31 @@ class ResultsView(ctk.CTkScrollableFrame):
             )
             card.pack(fill="x", pady=4, padx=4)
             self.cards.append(card)
+
+        self._rendered_count = end_idx
+
+        # If there are remaining documents, provide a sleek button to load next batch
+        if self._rendered_count < len(self._all_results):
+            remaining = len(self._all_results) - self._rendered_count
+            load_count = min(remaining, self.BATCH_SIZE)
+            t = self.theme
+            radius = t.get("corner_radius", 12)
+            btn_rad = 6 if radius > 0 else 0
+            self.btn_load_more = ctk.CTkButton(
+                self,
+                text=f"＋ Load {load_count} More Documents  •  ({self._rendered_count} of {len(self._all_results)} shown)",
+                fg_color=t["btn_secondary_bg"],
+                hover_color=t["btn_secondary_hover"],
+                border_width=t["border_width"],
+                border_color=t["btn_secondary_border"],
+                text_color=t["btn_secondary_fg"],
+                font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+                height=38,
+                corner_radius=btn_rad,
+                command=self._render_next_batch
+            )
+            self.btn_load_more.pack(fill="x", pady=(8, 16), padx=12)
+            self.cards.append(self.btn_load_more)
 
     def _handle_card_select(self, doc_data: Dict[str, Any]):
         self.selected_doc_id = doc_data.get("id")

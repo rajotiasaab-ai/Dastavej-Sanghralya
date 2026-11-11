@@ -442,6 +442,7 @@ class DocxDatabaseApp(ctk.CTk):
         )
         self.search_entry.grid(row=0, column=0, sticky="ew")
         self.search_entry.bind("<KeyRelease>", self._on_search_key_release)
+        self.search_entry.bind("<Return>", self._on_search_enter)
         self.search_entry.bind("<FocusIn>", lambda e: self.search_entry.configure(border_color=self.theme["search_entry_focus"]))
         self.search_entry.bind("<FocusOut>", lambda e: self.search_entry.configure(border_color=self.theme["search_entry_border"]))
 
@@ -767,13 +768,19 @@ class DocxDatabaseApp(ctk.CTk):
                 results, total_cnt = self.db.search_documents(query_str, scope=scope, sort_by=sort_by, limit=200)
                 elapsed = time.time() - t0
 
-                self.after(0, lambda qid=query_id, res=results, cnt=total_cnt, el=elapsed:
-                           self._on_background_search_done(qid, res, cnt, el))
+                if self._search_worker_running:
+                    try:
+                        if self.winfo_exists():
+                            self.after(0, lambda qid=query_id, res=results, cnt=total_cnt, el=elapsed:
+                                       self._on_background_search_done(qid, res, cnt, el))
+                    except Exception:
+                        pass
                 self._search_queue.task_done()
             except queue.Empty:
                 continue
             except Exception as e:
-                print(f"[SearchWorker] Error: {e}")
+                if self._search_worker_running:
+                    print(f"[SearchWorker] Error: {e}")
 
     def _trigger_background_search(self, immediate: bool = False):
         self._query_counter += 1
@@ -781,18 +788,41 @@ class DocxDatabaseApp(ctk.CTk):
         self._search_queue.put((query_id, self.current_query, self.current_scope, self.current_sort))
 
     def _on_search_key_release(self, event=None):
+        if event and event.keysym in ("Up", "Down", "Left", "Right", "Control_L", "Control_R", "Alt_L", "Alt_R", "Shift_L", "Shift_R", "Escape", "Return"):
+            return
+
         new_text = self.search_entry.get().strip()
         if new_text == self.current_query:
             return
         self.current_query = new_text
 
-        # Push query directly into background search thread (Zero-flicker instant search)
+        # If user cleared the query, return to library immediately
+        if not self.current_query:
+            if getattr(self, "_typing_timer", None):
+                self.after_cancel(self._typing_timer)
+                self._typing_timer = None
+            self.status_lbl.configure(text="Loading library...")
+            self._trigger_background_search(immediate=True)
+            return
+
+        # Smooth debouncing: allows uninterrupted, 60fps full-speed typing with ZERO freeze!
+        self.status_lbl.configure(text="Typing...")
+        if getattr(self, "_typing_timer", None):
+            self.after_cancel(self._typing_timer)
+        self._typing_timer = self.after(200, self._perform_debounced_search)
+
+    def _perform_debounced_search(self):
+        self._typing_timer = None
+        self.status_lbl.configure(text="Searching repository...")
         self._trigger_background_search()
 
-        if self.current_query:
-            self.status_lbl.configure(text="Searching repository...")
-        else:
-            self.status_lbl.configure(text="Updating library...")
+    def _on_search_enter(self, event=None):
+        if getattr(self, "_typing_timer", None):
+            self.after_cancel(self._typing_timer)
+            self._typing_timer = None
+        self.current_query = self.search_entry.get().strip()
+        self.status_lbl.configure(text="Searching repository...")
+        self._trigger_background_search(immediate=True)
 
     def _on_background_search_done(self, query_id: int, results: list, total_cnt: int, elapsed: float):
         if query_id < self._latest_delivered_id:
@@ -824,10 +854,14 @@ class DocxDatabaseApp(ctk.CTk):
         if results:
             first_doc_summary = results[0]
             doc_id = first_doc_summary.get("id")
-            if doc_id:
-                full_doc = self.db.get_document_by_id(doc_id)
-                if full_doc:
-                    self.preview_pane.display_document(full_doc, search_term=query)
+            current_id = self.preview_pane.current_doc.get("id") if self.preview_pane.current_doc else None
+            # Only reload preview if the displayed document actually changed
+            if doc_id and doc_id != current_id:
+                def load_top_preview():
+                    full_doc = self.db.get_document_by_id(doc_id)
+                    if full_doc and self.winfo_exists():
+                        self.preview_pane.display_document(full_doc, search_term=query)
+                self.after(30, load_top_preview)
         else:
             self.preview_pane.show_placeholder()
 
@@ -978,8 +1012,8 @@ class DocxDatabaseApp(ctk.CTk):
         if not getattr(self, "_rgb_running", False) or not self.winfo_exists():
             return
 
-        # Gentle, serene ambient pace (110ms interval, 0.005 step)
-        self._rgb_hue = (self._rgb_hue + 0.005) % 1.0
+        # Gentle, serene ambient pace (160ms interval, 0.004 step)
+        self._rgb_hue = (self._rgb_hue + 0.004) % 1.0
 
         # Dynamic rainbow RGB wave across LEDs
         led_colors = []
@@ -1000,7 +1034,7 @@ class DocxDatabaseApp(ctk.CTk):
         except Exception:
             pass
 
-        self._rgb_timer = self.after(110, self._step_rgb_lights)
+        self._rgb_timer = self.after(160, self._step_rgb_lights)
 
     def _on_close(self):
         self._rgb_running = False
