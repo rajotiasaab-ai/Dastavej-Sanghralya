@@ -11,6 +11,23 @@ ROOT_DIR = Path(__file__).resolve().parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
+# Enable Per-Monitor High-DPI awareness on Windows for crystal-clear, non-blurry fonts and graphics
+if sys.platform.startswith("win"):
+    try:
+        import ctypes
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(2)  # Per-Monitor DPI Aware
+        except Exception:
+            try:
+                ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+            except Exception:
+                try:
+                    ctypes.windll.user32.SetProcessDPIAware()
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
 from src.ui.app import DocxDatabaseApp
 
 def main():

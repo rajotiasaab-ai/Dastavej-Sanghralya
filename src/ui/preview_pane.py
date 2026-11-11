@@ -1,5 +1,6 @@
 """Document Inspector / Preview Pane for Dastavej Sanghralya.
-Supports Glassy (inspired by Spicetify Glassy / iOS Flow), Retro, Dark, and Light themes.
+Supports Liquid Glass (Apple HIG), Glassy, Retro, Dark, and Light themes.
+Features large, comfortable typography and dynamic text zoom controls for effortless reading.
 """
 
 import os
@@ -28,10 +29,10 @@ def format_timestamp(ts: float) -> str:
         return "Unknown"
 
 class PreviewPane(ctk.CTkFrame):
-    """Right-side Document Inspector pane with dynamic theme awareness."""
+    """Right-side Document Inspector pane with dynamic theme awareness and high-legibility zoom controls."""
 
     def __init__(self, parent, theme: Optional[Dict[str, Any]] = None, **kwargs):
-        self.theme = theme or getattr(parent, "theme", None) or get_theme("glassy")
+        self.theme = theme or getattr(parent, "theme", None) or get_theme("liquid_glass")
         kwargs.setdefault("fg_color", self.theme["preview_bg"])
         kwargs.setdefault("border_width", self.theme["border_width"])
         kwargs.setdefault("border_color", self.theme["preview_border"])
@@ -39,6 +40,8 @@ class PreviewPane(ctk.CTkFrame):
         super().__init__(parent, **kwargs)
         self.current_doc: Optional[Dict[str, Any]] = None
         self._load_token = 0
+        self.font_size = 14  # Large, comfortable default reading size
+
         self._build_ui()
         self.show_placeholder()
 
@@ -48,20 +51,20 @@ class PreviewPane(ctk.CTkFrame):
         btn_rad = 8 if radius > 0 else 0
 
         # Window Title Bar
-        self.preview_titlebar = ctk.CTkFrame(self, fg_color=t["titlebar_bg"], corner_radius=radius, height=24)
-        self.preview_titlebar.pack(fill="x", padx=2, pady=(2, 6))
+        self.preview_titlebar = ctk.CTkFrame(self, fg_color=t["titlebar_bg"], corner_radius=radius, height=28)
+        self.preview_titlebar.pack(fill="x", padx=3, pady=(3, 6))
 
         self.preview_title_lbl = ctk.CTkLabel(
             self.preview_titlebar,
             text=f"{t.get('titlebar_icon', '📄')} DOCUMENT PREVIEW INSPECTOR",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t["titlebar_fg"]
         )
-        self.preview_title_lbl.pack(side="left", padx=6, pady=2)
+        self.preview_title_lbl.pack(side="left", padx=8, pady=3)
 
         # 1. Header Frame (Title + Actions)
         self.header_frame = ctk.CTkFrame(self, fg_color="transparent")
-        self.header_frame.pack(fill="x", padx=12, pady=(4, 6))
+        self.header_frame.pack(fill="x", padx=14, pady=(4, 6))
 
         # Title row
         title_row = ctk.CTkFrame(self.header_frame, fg_color="transparent")
@@ -71,20 +74,20 @@ class PreviewPane(ctk.CTkFrame):
         self.icon_badge = ctk.CTkLabel(
             title_row,
             text=" 📄 DOCX ",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             fg_color=t["card_badge_bg"],
             border_width=1,
             border_color=t["card_badge_border"],
             text_color=t["card_badge_fg"],
             corner_radius=4 if radius > 0 else 0,
-            height=20
+            height=22
         )
-        self.icon_badge.pack(side="left", padx=(0, 6))
+        self.icon_badge.pack(side="left", padx=(0, 8))
 
         self.filename_label = ctk.CTkLabel(
             title_row,
             text="",
-            font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
             text_color=t["preview_title_fg"],
             anchor="w"
         )
@@ -93,11 +96,11 @@ class PreviewPane(ctk.CTkFrame):
         self.path_label = ctk.CTkLabel(
             self.header_frame,
             text="",
-            font=ctk.CTkFont(family="Segoe UI", size=10),
+            font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color=t["preview_path_fg"],
             anchor="w"
         )
-        self.path_label.pack(fill="x", pady=(2, 8))
+        self.path_label.pack(fill="x", pady=(3, 8))
 
         # Action Buttons Bar
         self.actions_frame = ctk.CTkFrame(self.header_frame, fg_color="transparent")
@@ -111,12 +114,12 @@ class PreviewPane(ctk.CTkFrame):
             border_width=t["border_width"],
             border_color=t["btn_primary_border"],
             text_color=t["btn_primary_fg"],
-            height=30,
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            height=34,
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             corner_radius=btn_rad,
             command=self._on_open_in_word
         )
-        self.btn_open_word.pack(side="left", padx=(0, 6))
+        self.btn_open_word.pack(side="left", padx=(0, 8))
 
         self.btn_reveal = ctk.CTkButton(
             self.actions_frame,
@@ -126,12 +129,12 @@ class PreviewPane(ctk.CTkFrame):
             border_width=t["border_width"],
             border_color=t["btn_secondary_border"],
             text_color=t["btn_secondary_fg"],
-            height=30,
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            height=34,
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             corner_radius=btn_rad,
             command=self._on_reveal_in_explorer
         )
-        self.btn_reveal.pack(side="left", padx=(0, 6))
+        self.btn_reveal.pack(side="left", padx=(0, 8))
 
         self.btn_copy_path = ctk.CTkButton(
             self.actions_frame,
@@ -141,8 +144,8 @@ class PreviewPane(ctk.CTkFrame):
             border_width=t["border_width"],
             border_color=t["btn_secondary_border"],
             text_color=t["btn_secondary_fg"],
-            height=30,
-            font=ctk.CTkFont(family="Segoe UI", size=11),
+            height=34,
+            font=ctk.CTkFont(family="Segoe UI", size=12),
             corner_radius=btn_rad,
             command=self._on_copy_path
         )
@@ -156,46 +159,94 @@ class PreviewPane(ctk.CTkFrame):
             border_color=t["preview_meta_border"],
             corner_radius=btn_rad
         )
-        self.meta_frame.pack(fill="x", pady=(0, 6))
+        self.meta_frame.pack(fill="x", pady=(0, 8))
 
         self.meta_info_label = ctk.CTkLabel(
             self.meta_frame,
             text="",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             text_color=t["preview_meta_fg"],
             anchor="w",
-            padx=10,
-            pady=6
+            padx=12,
+            pady=8
         )
         self.meta_info_label.pack(fill="x")
 
-        # Section Divider
+        # Section Divider & Font Size Controls
+        self.content_header_row = ctk.CTkFrame(self, fg_color="transparent")
+        self.content_header_row.pack(fill="x", padx=14, pady=(4, 4))
+
         self.content_title_label = ctk.CTkLabel(
-            self,
+            self.content_header_row,
             text="DOCUMENT CONTENT READING WELL",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t.get("subbrand_fg", t["titlebar_bg"]),
             anchor="w"
         )
-        self.content_title_label.pack(fill="x", padx=12, pady=(4, 2))
+        self.content_title_label.pack(side="left")
+
+        # Dynamic Text Zoom Controls
+        self.zoom_frame = ctk.CTkFrame(self.content_header_row, fg_color="transparent")
+        self.zoom_frame.pack(side="right")
+
+        self.btn_font_dec = ctk.CTkButton(
+            self.zoom_frame,
+            text="A-",
+            width=30,
+            height=24,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_width=t["border_width"],
+            border_color=t["btn_secondary_border"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=4 if radius > 0 else 0,
+            command=self._decrease_font_size
+        )
+        self.btn_font_dec.pack(side="left", padx=(0, 4))
+
+        self.lbl_font_size = ctk.CTkLabel(
+            self.zoom_frame,
+            text=f"{self.font_size} pt",
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            text_color=t["preview_title_fg"],
+            width=46
+        )
+        self.lbl_font_size.pack(side="left", padx=(0, 4))
+
+        self.btn_font_inc = ctk.CTkButton(
+            self.zoom_frame,
+            text="A+",
+            width=30,
+            height=24,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_width=t["border_width"],
+            border_color=t["btn_secondary_border"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=4 if radius > 0 else 0,
+            command=self._increase_font_size
+        )
+        self.btn_font_inc.pack(side="left")
 
         # Processing Circle
         self.spinner = LoadingSpinner(
             self,
-            size=44,
+            size=48,
             ring_width=4,
             ring_color=t["spinner_ring"],
             track_color=t["spinner_track"],
             text="Retrieving document content...",
-            text_size=11,
+            text_size=12,
             bg_color=t["spinner_bg"]
         )
 
-        # Editor-Style Text Preview Box
+        # Editor-Style Text Preview Box (Large, High-Legibility Font)
         self.text_preview = ctk.CTkTextbox(
             self,
             wrap="word",
-            font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=11),
+            font=ctk.CTkFont(family="Segoe UI", size=self.font_size),
             fg_color=t["preview_text_bg"],
             text_color=t["preview_text_fg"],
             border_width=t["border_width"],
@@ -203,6 +254,22 @@ class PreviewPane(ctk.CTkFrame):
             corner_radius=btn_rad
         )
         self.text_preview.tag_config("match_hl", background=t["preview_match_hl"], foreground=t["preview_match_hl_fg"])
+
+    def _increase_font_size(self):
+        if self.font_size < 28:
+            self.font_size += 2
+            self._update_preview_font()
+
+    def _decrease_font_size(self):
+        if self.font_size > 10:
+            self.font_size -= 2
+            self._update_preview_font()
+
+    def _update_preview_font(self):
+        self.lbl_font_size.configure(text=f"{self.font_size} pt")
+        self.text_preview.configure(
+            font=ctk.CTkFont(family="Segoe UI", size=self.font_size)
+        )
 
     def apply_theme(self, theme: Dict[str, Any]):
         self.theme = theme
@@ -263,7 +330,25 @@ class PreviewPane(ctk.CTkFrame):
         self.meta_info_label.configure(text_color=t["preview_meta_fg"])
         self.content_title_label.configure(text_color=t.get("subbrand_fg", t["titlebar_bg"]))
 
-        self.spinner.apply_theme(t)
+        self.btn_font_dec.configure(
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_color=t["btn_secondary_border"],
+            border_width=t["border_width"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=4 if radius > 0 else 0
+        )
+        self.btn_font_inc.configure(
+            fg_color=t["btn_secondary_bg"],
+            hover_color=t["btn_secondary_hover"],
+            border_color=t["btn_secondary_border"],
+            border_width=t["border_width"],
+            text_color=t["btn_secondary_fg"],
+            corner_radius=4 if radius > 0 else 0
+        )
+        self.lbl_font_size.configure(text_color=t["preview_title_fg"])
+
+        self.spinner.apply_theme({**t, "spinner_bg": t["preview_bg"]})
 
         self.text_preview.configure(
             fg_color=t["preview_text_bg"],
@@ -285,18 +370,18 @@ class PreviewPane(ctk.CTkFrame):
         self.path_label.configure(text="Select any document from the results to inspect content.", text_color=self.theme["preview_path_fg"])
         self.actions_frame.pack_forget()
         self.meta_frame.pack_forget()
-        self.content_title_label.pack_forget()
+        self.content_header_row.pack_forget()
         self.text_preview.pack_forget()
 
     def show_loading(self, filename: str = "Loading document..."):
         """Displays processing circle instead of full document text."""
         self._load_token += 1
-        self.icon_badge.pack(side="left", padx=(0, 6))
+        self.icon_badge.pack(side="left", padx=(0, 8))
         self.filename_label.configure(text=filename, text_color=self.theme["preview_title_fg"])
         self.path_label.configure(text="Retrieving document content...", text_color=self.theme["preview_path_fg"])
         self.actions_frame.pack_forget()
         self.meta_frame.pack_forget()
-        self.content_title_label.pack(fill="x", padx=12, pady=(4, 2))
+        self.content_header_row.pack(fill="x", padx=14, pady=(4, 4))
         self.text_preview.pack_forget()
 
         self.spinner.set_text("Reading document contents...")
@@ -309,10 +394,10 @@ class PreviewPane(ctk.CTkFrame):
         current_token = self._load_token
         self.current_doc = doc_data
 
-        self.icon_badge.pack(side="left", padx=(0, 6))
+        self.icon_badge.pack(side="left", padx=(0, 8))
         self.actions_frame.pack(fill="x", pady=(0, 8))
-        self.meta_frame.pack(fill="x", pady=(0, 6))
-        self.content_title_label.pack(fill="x", padx=12, pady=(4, 2))
+        self.meta_frame.pack(fill="x", pady=(0, 8))
+        self.content_header_row.pack(fill="x", padx=14, pady=(4, 4))
 
         filename = doc_data.get("filename", "")
         path_str = doc_data.get("path", "")
@@ -337,14 +422,10 @@ class PreviewPane(ctk.CTkFrame):
 
         self.meta_info_label.configure(text="   •   ".join(meta_parts))
 
-        # Show Processing Circle first
-        self.text_preview.pack_forget()
-        self.spinner.set_text("Rendering document preview...")
-        self.spinner.pack(fill="both", expand=True, pady=30)
-        self.spinner.start()
-
-        # Asynchronously render text content in next tick so the UI does not freeze
-        self.after(35, lambda: self._render_text_content(current_token, doc_data, search_term))
+        # Directly render document text without artificial 35ms spinner flash
+        self.spinner.stop()
+        self.spinner.pack_forget()
+        self._render_text_content(current_token, doc_data, search_term)
 
     def _render_text_content(self, token: int, doc_data: Dict[str, Any], search_term: str):
         if token != self._load_token:
@@ -370,7 +451,7 @@ class PreviewPane(ctk.CTkFrame):
         # Hide spinner and show text
         self.spinner.stop()
         self.spinner.pack_forget()
-        self.text_preview.pack(fill="both", expand=True, padx=12, pady=(0, 12))
+        self.text_preview.pack(fill="both", expand=True, padx=14, pady=(0, 14))
 
     def _highlight_matches(self, term: str, max_matches: int = 40):
         query_words = [w for w in term.replace('"', '').split() if len(w) > 1]

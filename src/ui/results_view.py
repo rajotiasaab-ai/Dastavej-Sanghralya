@@ -1,5 +1,6 @@
 """Results View for Dastavej Sanghralya.
-Supports Glassy (inspired by Spicetify Glassy / iOS Flow), Retro, Dark, and Light themes.
+Supports Liquid Glass (Apple HIG), Glassy, Retro, Dark, and Light themes.
+Features large, high-legibility typography for effortless scanning and reading.
 """
 
 import os
@@ -28,7 +29,7 @@ def format_timestamp(ts: float) -> str:
         return "Unknown"
 
 class ResultCard(ctk.CTkFrame):
-    """Dynamic theme-aware document card."""
+    """Dynamic theme-aware document card with large, readable fonts."""
 
     def __init__(
         self,
@@ -40,7 +41,7 @@ class ResultCard(ctk.CTkFrame):
         theme: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
-        self.theme = theme or getattr(parent, "theme", None) or get_theme("glassy")
+        self.theme = theme or getattr(parent, "theme", None) or get_theme("liquid_glass")
         radius = self.theme.get("corner_radius", 12)
         kwargs.setdefault("corner_radius", radius)
         super().__init__(parent, **kwargs)
@@ -76,11 +77,11 @@ class ResultCard(ctk.CTkFrame):
                 border_color=t["card_selected_border"]
             )
             if hasattr(self, "title_lbl"):
-                self.title_lbl.configure(text_color=t.get("card_selected_fg", t["card_title_fg"]))
+                self.title_lbl.configure(text_color=t.get("card_selected_title_fg", t.get("card_selected_fg", t["card_title_fg"])))
             if hasattr(self, "path_lbl"):
-                self.path_lbl.configure(text_color=t["card_meta_fg"])
+                self.path_lbl.configure(text_color=t.get("card_selected_path_fg", t["card_meta_fg"]))
             if hasattr(self, "meta_chip"):
-                self.meta_chip.configure(text_color=t["card_badge_bg"])
+                self.meta_chip.configure(text_color=t.get("card_selected_meta_fg", t["card_badge_bg"]))
             if hasattr(self, "snippet_container"):
                 self.snippet_container.configure(fg_color=t["snippet_bg"], border_color=t["card_selected_border"])
             if hasattr(self, "snippet_lbl"):
@@ -144,27 +145,27 @@ class ResultCard(ctk.CTkFrame):
 
         # Top row: Filename, Badges, Metrics
         top_row = ctk.CTkFrame(self, fg_color="transparent")
-        top_row.pack(fill="x", padx=12, pady=(8, 2))
+        top_row.pack(fill="x", padx=14, pady=(10, 3))
 
         # DOCX badge
         self.ext_badge = ctk.CTkLabel(
             top_row,
             text=" DOCX ",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             fg_color=t["card_badge_bg"],
             border_width=1,
             border_color=t["card_badge_border"],
             text_color=t["card_badge_fg"],
             corner_radius=4 if radius > 0 else 0,
-            height=18
+            height=22
         )
-        self.ext_badge.pack(side="left", padx=(0, 6))
+        self.ext_badge.pack(side="left", padx=(0, 8))
 
-        # Document Title
+        # Document Title (Large, Clear Font)
         self.title_lbl = ctk.CTkLabel(
             top_row,
             text=filename,
-            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=14, weight="bold"),
             text_color=t["card_title_fg"],
             anchor="w"
         )
@@ -174,25 +175,25 @@ class ResultCard(ctk.CTkFrame):
         self.meta_chip = ctk.CTkLabel(
             top_row,
             text=f"📊 {words:,}w  •  💾 {file_size}  •  🕒 {mtime}",
-            font=ctk.CTkFont(family="Segoe UI", size=10),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t["card_meta_fg"]
         )
         self.meta_chip.pack(side="right")
 
         # Second row: Path
         path_row = ctk.CTkFrame(self, fg_color="transparent")
-        path_row.pack(fill="x", padx=12, pady=(0, 4))
+        path_row.pack(fill="x", padx=14, pady=(0, 4))
 
         self.path_lbl = ctk.CTkLabel(
             path_row,
             text=f"📁 {path_str}",
-            font=ctk.CTkFont(family="Segoe UI", size=10),
+            font=ctk.CTkFont(family="Segoe UI", size=11),
             text_color=t["card_path_fg"],
             anchor="w"
         )
         self.path_lbl.pack(fill="x")
 
-        # Third row: Snippet Box
+        # Third row: Snippet Box (Readable size 12 font with generous padding)
         if snippet:
             self.snippet_container = ctk.CTkFrame(
                 self,
@@ -201,19 +202,19 @@ class ResultCard(ctk.CTkFrame):
                 border_color=t["snippet_border"],
                 corner_radius=6 if radius > 0 else 0
             )
-            self.snippet_container.pack(fill="x", padx=12, pady=(2, 8))
+            self.snippet_container.pack(fill="x", padx=14, pady=(3, 10))
 
             clean_snippet = snippet.replace("«HL»", "「").replace("«/HL»", "」")
             self.snippet_lbl = ctk.CTkLabel(
                 self.snippet_container,
                 text=f"⚡ {clean_snippet.strip()}",
-                font=ctk.CTkFont(family="Segoe UI", size=10),
+                font=ctk.CTkFont(family="Segoe UI", size=12),
                 text_color=t["snippet_fg"],
                 anchor="w",
                 justify="left",
                 wraplength=540,
-                padx=8,
-                pady=4
+                padx=10,
+                pady=6
             )
             self.snippet_lbl.pack(fill="x")
         else:
@@ -253,8 +254,8 @@ class ResultCard(ctk.CTkFrame):
             tearoff=0,
             bg=t.get("menu_dropdown_bg", "#1c140e"),
             fg=t.get("menu_dropdown_fg", "#fff6e8"),
-            activebackground=t.get("btn_primary_bg", "#e8b847"),
-            activeforeground=t.get("btn_primary_fg", "#140e0a")
+            activebackground=t.get("btn_primary_bg", "#0071e3"),
+            activeforeground=t.get("btn_primary_fg", "#ffffff")
         )
         menu.add_command(label="🚀 Open in Word", command=lambda: self.on_open(self.doc_data))
         menu.add_command(label="📂 Show in File Explorer", command=self._reveal_in_explorer)
@@ -283,7 +284,7 @@ class ResultsView(ctk.CTkScrollableFrame):
         theme: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
-        self.theme = theme or getattr(parent, "theme", None) or get_theme("glassy")
+        self.theme = theme or getattr(parent, "theme", None) or get_theme("liquid_glass")
         kwargs.setdefault("fg_color", self.theme["results_bg"])
         kwargs.setdefault("border_width", self.theme["border_width"])
         kwargs.setdefault("border_color", self.theme["results_border"])
@@ -302,7 +303,7 @@ class ResultsView(ctk.CTkScrollableFrame):
             ring_color=self.theme["spinner_ring"],
             track_color=self.theme["spinner_track"],
             text="Searching repository in background...",
-            text_size=11,
+            text_size=12,
             bg_color=self.theme["spinner_bg"]
         )
         self.is_loading = False
@@ -315,7 +316,7 @@ class ResultsView(ctk.CTkScrollableFrame):
             border_width=theme["border_width"],
             corner_radius=theme["corner_radius"]
         )
-        self.spinner.apply_theme(theme)
+        self.spinner.apply_theme({**theme, "spinner_bg": theme["results_bg"]})
         for widget in self.cards:
             if isinstance(widget, ResultCard):
                 widget.apply_theme(theme)
@@ -352,14 +353,14 @@ class ResultsView(ctk.CTkScrollableFrame):
             icon_lbl = ctk.CTkLabel(
                 empty_container,
                 text="🔍",
-                font=ctk.CTkFont(size=36)
+                font=ctk.CTkFont(size=40)
             )
-            icon_lbl.pack(pady=(0, 8))
+            icon_lbl.pack(pady=(0, 10))
 
             empty_lbl = ctk.CTkLabel(
                 empty_container,
                 text="No documents found matching query.",
-                font=ctk.CTkFont(family="Segoe UI", size=13, weight="bold"),
+                font=ctk.CTkFont(family="Segoe UI", size=15, weight="bold"),
                 text_color=self.theme["card_title_fg"]
             )
             empty_lbl.pack()
@@ -367,10 +368,10 @@ class ResultsView(ctk.CTkScrollableFrame):
             hint_lbl = ctk.CTkLabel(
                 empty_container,
                 text="Try searching with fewer words, partial terms, or check other monitored folders.",
-                font=ctk.CTkFont(family="Segoe UI", size=11),
+                font=ctk.CTkFont(family="Segoe UI", size=12),
                 text_color=self.theme["card_meta_fg"]
             )
-            hint_lbl.pack(pady=(4, 0))
+            hint_lbl.pack(pady=(6, 0))
 
             self.cards.append(empty_container)
             return
@@ -386,7 +387,7 @@ class ResultsView(ctk.CTkScrollableFrame):
                 is_selected=(doc_id == self.selected_doc_id),
                 theme=self.theme
             )
-            card.pack(fill="x", pady=3, padx=4)
+            card.pack(fill="x", pady=4, padx=4)
             self.cards.append(card)
 
     def _handle_card_select(self, doc_data: Dict[str, Any]):

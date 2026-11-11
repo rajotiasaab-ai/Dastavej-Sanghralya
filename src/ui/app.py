@@ -1,6 +1,7 @@
 """Desktop Application for Dastavej Sanghralya (दस्तावेज़ संग्रहालय).
 100% offline, native desktop interface powered by CustomTkinter.
-Supports Glassy (inspired by Spicetify Glassy / iOS Flow), Retro, Dark, Light, and System themes.
+Supports Liquid Glass (Apple HIG), Glassy, Retro, Dark, Light, and System themes.
+Features large, comfortable typography for effortless reading.
 """
 
 import os
@@ -30,6 +31,23 @@ class DocxDatabaseApp(ctk.CTk):
     """Main Application Window for Dastavej Sanghralya."""
 
     def __init__(self):
+        # Ensure Windows Per-Monitor High-DPI awareness is active for crystal-clear, non-blurry rendering
+        if sys.platform.startswith("win"):
+            try:
+                import ctypes
+                try:
+                    ctypes.windll.shcore.SetProcessDpiAwareness(2)
+                except Exception:
+                    try:
+                        ctypes.windll.user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(-4))
+                    except Exception:
+                        try:
+                            ctypes.windll.user32.SetProcessDPIAware()
+                        except Exception:
+                            pass
+            except Exception:
+                pass
+
         super().__init__()
 
         # 1. Initialize Core Services (Preserved 100%)
@@ -39,14 +57,14 @@ class DocxDatabaseApp(ctk.CTk):
         self.watcher = DocxWatcher(self.db, on_change=self._on_file_changed)
 
         # 2. Window Configurations & Dynamic Theme System
-        self.theme_name = getattr(self.config, "theme", "glassy") or "glassy"
+        self.theme_name = getattr(self.config, "theme", "liquid_glass") or "liquid_glass"
         self.theme = get_theme(self.theme_name)
         ctk.set_appearance_mode(self.theme["appearance_mode"])
         ctk.set_default_color_theme("blue")
 
         self.title("Dastavej Sanghralya - Developed by Anoop Kumar")
-        self.geometry("1320x840")
-        self.minsize(1020, 640)
+        self.geometry("1340x860")
+        self.minsize(1040, 660)
         self.configure(fg_color=self.theme["desktop_bg"])
 
         # Set Window Icon
@@ -107,7 +125,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_layout(self):
-        self.grid_columnconfigure(0, weight=0, minsize=280)
+        self.grid_columnconfigure(0, weight=0, minsize=290)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
@@ -116,40 +134,40 @@ class DocxDatabaseApp(ctk.CTk):
 
     def _build_sidebar(self):
         t = self.theme
-        radius = t.get("corner_radius", 12)
+        radius = t.get("corner_radius", 14)
         btn_rad = 8 if radius > 0 else 0
 
         self.sidebar = ctk.CTkFrame(
             self,
-            width=280,
+            width=290,
             corner_radius=radius,
             fg_color=t["sidebar_bg"],
             border_width=t["border_width"],
             border_color=t["sidebar_border"]
         )
-        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=(6, 3), pady=6)
+        self.sidebar.grid(row=0, column=0, sticky="nsew", padx=(8, 4), pady=8)
         self.sidebar.grid_rowconfigure(9, weight=1)
 
         # Window Title Bar
-        self.sb_titlebar = ctk.CTkFrame(self.sidebar, fg_color=t["titlebar_bg"], corner_radius=radius, height=24)
-        self.sb_titlebar.grid(row=0, column=0, sticky="ew", padx=2, pady=(2, 6))
+        self.sb_titlebar = ctk.CTkFrame(self.sidebar, fg_color=t["titlebar_bg"], corner_radius=radius, height=28)
+        self.sb_titlebar.grid(row=0, column=0, sticky="ew", padx=3, pady=(3, 6))
 
         self.sb_title_lbl = ctk.CTkLabel(
             self.sb_titlebar,
             text=f"{t.get('titlebar_icon', '💾')} DASTAVEJ CONTROL PANEL",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t["titlebar_fg"]
         )
-        self.sb_title_lbl.pack(side="left", padx=6, pady=2)
+        self.sb_title_lbl.pack(side="left", padx=8, pady=3)
 
         # App Brand Header
         brand_frame = ctk.CTkFrame(self.sidebar, fg_color="transparent")
-        brand_frame.grid(row=1, column=0, padx=14, pady=(6, 4), sticky="ew")
+        brand_frame.grid(row=1, column=0, padx=16, pady=(6, 4), sticky="ew")
 
         self.brand_lbl = ctk.CTkLabel(
             brand_frame,
             text="📑 DASTAVEJ",
-            font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
             text_color=t["brand_fg"]
         )
         self.brand_lbl.pack(anchor="w")
@@ -157,7 +175,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.sub_brand_lbl = ctk.CTkLabel(
             brand_frame,
             text="दस्तावेज़ संग्रहालय • Offline Word Hub",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t["subbrand_fg"]
         )
         self.sub_brand_lbl.pack(anchor="w", pady=(1, 0))
@@ -181,9 +199,9 @@ class DocxDatabaseApp(ctk.CTk):
             dot = ctk.CTkLabel(
                 self.rgb_led_strip,
                 text="●",
-                font=ctk.CTkFont(family="Segoe UI", size=8, weight="bold"),
+                font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
                 text_color="#ffff00",
-                width=10
+                width=12
             )
             dot.pack(side="left", padx=1)
             self.rgb_leds.append(dot)
@@ -191,7 +209,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.rgb_dev_lbl = ctk.CTkLabel(
             self.rgb_badge,
             text="Developed by Anoop Kumar",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color="#ffffff"
         )
         self.rgb_dev_lbl.pack(side="left", padx=(2, 10), pady=4)
@@ -204,15 +222,15 @@ class DocxDatabaseApp(ctk.CTk):
             border_color=t["status_border"],
             corner_radius=btn_rad
         )
-        self.status_pill.grid(row=2, column=0, padx=14, pady=(8, 10), sticky="ew")
+        self.status_pill.grid(row=2, column=0, padx=16, pady=(8, 10), sticky="ew")
 
         self.status_pill_lbl = ctk.CTkLabel(
             self.status_pill,
             text="● LIVE SYNC ACTIVE" if self.config.auto_watch else "○ LIVE SYNC OFF",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color="#00e676" if (self.config.auto_watch and t["appearance_mode"]=="dark") else ("#006600" if self.config.auto_watch else t["card_path_fg"]),
-            padx=8,
-            pady=3
+            padx=10,
+            pady=4
         )
         self.status_pill_lbl.pack(anchor="w")
 
@@ -224,12 +242,12 @@ class DocxDatabaseApp(ctk.CTk):
             border_color=t["results_border"],
             corner_radius=btn_rad
         )
-        self.stats_card.grid(row=3, column=0, padx=14, pady=4, sticky="ew")
+        self.stats_card.grid(row=3, column=0, padx=16, pady=4, sticky="ew")
 
         stats_hdr = ctk.CTkLabel(
             self.stats_card,
             text="INDEX METRICS",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             text_color=t["card_meta_fg"]
         )
         stats_hdr.pack(anchor="w", padx=12, pady=(8, 2))
@@ -237,7 +255,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.lbl_stat_docs = ctk.CTkLabel(
             self.stats_card,
             text="0 Documents",
-            font=ctk.CTkFont(family="Segoe UI", size=16, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=18, weight="bold"),
             text_color=t["card_title_fg"],
             anchor="w"
         )
@@ -246,7 +264,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.lbl_stat_words = ctk.CTkLabel(
             self.stats_card,
             text="0 total indexed words",
-            font=ctk.CTkFont(family="Segoe UI", size=11),
+            font=ctk.CTkFont(family="Segoe UI", size=12),
             text_color=t["subbrand_fg"],
             anchor="w"
         )
@@ -256,8 +274,8 @@ class DocxDatabaseApp(ctk.CTk):
         self.btn_rescan = ctk.CTkButton(
             self.sidebar,
             text="🔄 Rescan Folders",
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            height=34,
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+            height=36,
             fg_color=t["btn_primary_bg"],
             hover_color=t["btn_primary_hover"],
             border_width=t["border_width"],
@@ -266,13 +284,13 @@ class DocxDatabaseApp(ctk.CTk):
             corner_radius=btn_rad,
             command=self._start_manual_scan
         )
-        self.btn_rescan.grid(row=4, column=0, padx=14, pady=(12, 5), sticky="ew")
+        self.btn_rescan.grid(row=4, column=0, padx=16, pady=(12, 5), sticky="ew")
 
         self.btn_folders = ctk.CTkButton(
             self.sidebar,
             text="📁 Monitored Folders...",
-            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
-            height=34,
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
+            height=36,
             fg_color=t["btn_secondary_bg"],
             hover_color=t["btn_secondary_hover"],
             border_width=t["border_width"],
@@ -281,18 +299,18 @@ class DocxDatabaseApp(ctk.CTk):
             corner_radius=btn_rad,
             command=self._open_folder_dialog
         )
-        self.btn_folders.grid(row=5, column=0, padx=14, pady=5, sticky="ew")
+        self.btn_folders.grid(row=5, column=0, padx=16, pady=5, sticky="ew")
 
         # Auto-watch switch
         self.switch_watch = ctk.CTkSwitch(
             self.sidebar,
             text="Real-time Auto Sync",
-            font=ctk.CTkFont(family="Segoe UI", size=11),
+            font=ctk.CTkFont(family="Segoe UI", size=12),
             text_color=t["card_title_fg"],
             progress_color=t["btn_primary_bg"],
             command=self._on_toggle_auto_watch
         )
-        self.switch_watch.grid(row=6, column=0, padx=18, pady=(10, 4), sticky="w")
+        self.switch_watch.grid(row=6, column=0, padx=20, pady=(10, 4), sticky="w")
         if self.config.auto_watch:
             self.switch_watch.select()
         else:
@@ -307,38 +325,38 @@ class DocxDatabaseApp(ctk.CTk):
             corner_radius=btn_rad
         )
         self.sidebar.grid_rowconfigure(8, weight=1)
-        self.shortcuts_frame.grid(row=8, column=0, padx=14, pady=(12, 8), sticky="ew")
+        self.shortcuts_frame.grid(row=8, column=0, padx=16, pady=(12, 8), sticky="ew")
 
         self.sc_title = ctk.CTkLabel(
             self.shortcuts_frame,
             text="KEYBOARD SHORTCUTS",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             text_color=t["card_meta_fg"]
         )
-        self.sc_title.pack(anchor="w", padx=10, pady=(6, 2))
+        self.sc_title.pack(anchor="w", padx=12, pady=(8, 2))
 
         self.sc_list = ctk.CTkLabel(
             self.shortcuts_frame,
             text="[Ctrl + F]  Focus Search\n[Esc]       Clear Search\n[Enter]     Open in Word\n[↑ / ↓]     Navigate Cards",
-            font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=10),
+            font=ctk.CTkFont(family="Consolas" if os.name == "nt" else "Monospace", size=11),
             text_color=t["card_title_fg"],
             justify="left",
             anchor="w"
         )
-        self.sc_list.pack(anchor="w", padx=10, pady=(0, 6))
+        self.sc_list.pack(anchor="w", padx=12, pady=(0, 8))
 
         # Bottom Theme selector
         theme_lbl = ctk.CTkLabel(
             self.sidebar,
             text="APPEARANCE THEME:",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             text_color=t["card_meta_fg"]
         )
-        theme_lbl.grid(row=10, column=0, padx=16, pady=(0, 2), sticky="w")
+        theme_lbl.grid(row=10, column=0, padx=18, pady=(0, 2), sticky="w")
 
         self.theme_menu = ctk.CTkOptionMenu(
             self.sidebar,
-            values=["Glassy", "Dark", "Light", "Retro", "System"],
+            values=["Liquid Glass", "Glassy", "Dark", "Light", "Retro", "System"],
             command=self._on_change_theme,
             fg_color=t["btn_secondary_bg"],
             button_color=t["btn_secondary_bg"],
@@ -347,24 +365,25 @@ class DocxDatabaseApp(ctk.CTk):
             dropdown_hover_color=t["menu_dropdown_hover"],
             dropdown_text_color=t["menu_dropdown_fg"],
             text_color=t["btn_secondary_fg"],
-            height=28,
+            height=32,
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             corner_radius=btn_rad
         )
-        self.theme_menu.grid(row=11, column=0, padx=14, pady=(0, 8), sticky="ew")
+        self.theme_menu.grid(row=11, column=0, padx=16, pady=(0, 8), sticky="ew")
         self.theme_menu.set(t["name"])
 
         # Offline Engine Status
         self.engine_lbl = ctk.CTkLabel(
             self.sidebar,
             text="🔒 100% Offline Local Engine",
-            font=ctk.CTkFont(family="Segoe UI", size=9, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
             text_color=t["card_meta_fg"]
         )
-        self.engine_lbl.grid(row=12, column=0, padx=16, pady=(0, 12), sticky="w")
+        self.engine_lbl.grid(row=12, column=0, padx=18, pady=(0, 12), sticky="w")
 
     def _build_main_content(self):
         t = self.theme
-        radius = t.get("corner_radius", 12)
+        radius = t.get("corner_radius", 14)
         btn_rad = 8 if radius > 0 else 0
 
         # Framed Main Window
@@ -375,22 +394,22 @@ class DocxDatabaseApp(ctk.CTk):
             border_color=t["main_border"],
             corner_radius=radius
         )
-        self.main_frame.grid(row=0, column=1, sticky="nsew", padx=(3, 6), pady=6)
+        self.main_frame.grid(row=0, column=1, sticky="nsew", padx=(4, 8), pady=8)
         self.main_frame.grid_columnconfigure(0, weight=6)
         self.main_frame.grid_columnconfigure(1, weight=4)
         self.main_frame.grid_rowconfigure(3, weight=1)
 
         # Window Title Bar
-        self.main_titlebar = ctk.CTkFrame(self.main_frame, fg_color=t["titlebar_bg"], corner_radius=radius, height=24)
-        self.main_titlebar.grid(row=0, column=0, columnspan=2, sticky="ew", padx=2, pady=(2, 6))
+        self.main_titlebar = ctk.CTkFrame(self.main_frame, fg_color=t["titlebar_bg"], corner_radius=radius, height=28)
+        self.main_titlebar.grid(row=0, column=0, columnspan=2, sticky="ew", padx=3, pady=(3, 6))
 
         self.main_title_lbl = ctk.CTkLabel(
             self.main_titlebar,
             text=f"{t.get('titlebar_icon', '📑')} DASTAVEJ SANGHRALYA - DOCUMENT ARCHIVE EXPLORER",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             text_color=t["titlebar_fg"]
         )
-        self.main_title_lbl.pack(side="left", padx=8, pady=2)
+        self.main_title_lbl.pack(side="left", padx=8, pady=3)
 
         # 1. Search Bar Command Center
         self.search_frame = ctk.CTkFrame(
@@ -405,15 +424,15 @@ class DocxDatabaseApp(ctk.CTk):
 
         # Input container with clear button
         input_container = ctk.CTkFrame(self.search_frame, fg_color="transparent")
-        input_container.grid(row=0, column=0, sticky="ew", padx=(6, 4), pady=6)
+        input_container.grid(row=0, column=0, sticky="ew", padx=(8, 4), pady=6)
         input_container.grid_columnconfigure(0, weight=1)
 
-        # Search Entry (Always High Contrast & Readable)
+        # Large, High-Contrast Search Entry
         self.search_entry = ctk.CTkEntry(
             input_container,
             placeholder_text="🔍 Search document name or content (e.g. invoice, contract, budget)...",
-            height=36,
-            font=ctk.CTkFont(family="Segoe UI", size=12),
+            height=42,
+            font=ctk.CTkFont(family="Segoe UI", size=14),
             fg_color=t["search_entry_bg"],
             text_color=t["search_entry_fg"],
             placeholder_text_color=t["search_entry_placeholder"],
@@ -430,31 +449,29 @@ class DocxDatabaseApp(ctk.CTk):
         self.btn_clear = ctk.CTkButton(
             input_container,
             text="✕",
-            width=28,
-            height=28,
+            width=32,
+            height=32,
             fg_color=t["btn_clear_bg"],
             hover_color=t["btn_clear_hover"],
             border_width=t["border_width"],
             border_color=t["btn_clear_border"],
             text_color=t["btn_clear_fg"],
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             corner_radius=btn_rad,
             command=self._clear_search
         )
-        self.btn_clear.grid(row=0, column=1, padx=(4, 0))
+        self.btn_clear.grid(row=0, column=1, padx=(6, 0))
 
         # Scope Segmented Filter Tabs
         self.scope_segment = ctk.CTkSegmentedButton(
             self.search_frame,
             values=["⚡ All Fields", "🏷️ Title Only", "📄 Inside Content"],
             command=self._on_scope_chip_changed,
-            height=32,
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            height=36,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             fg_color=t["tabs_bg"],
             selected_color=t["tabs_selected"],
             selected_hover_color=t["tabs_selected_hover"],
-            unselected_color=t["tabs_unselected"],
-            unselected_hover_color=t["tabs_unselected_hover"],
             text_color=t["tabs_selected_fg"],
             corner_radius=btn_rad
         )
@@ -466,9 +483,9 @@ class DocxDatabaseApp(ctk.CTk):
             self.search_frame,
             values=["🎯 Best Match", "🕒 Recent", "🔤 By Name", "📦 By Size"],
             command=self._on_sort_chip_changed,
-            height=32,
-            width=125,
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            height=36,
+            width=135,
+            font=ctk.CTkFont(family="Segoe UI", size=11, weight="bold"),
             fg_color=t["btn_secondary_bg"],
             button_color=t["btn_secondary_bg"],
             button_hover_color=t["btn_secondary_hover"],
@@ -494,11 +511,11 @@ class DocxDatabaseApp(ctk.CTk):
         self.status_lbl = ctk.CTkLabel(
             self.status_bar_frame,
             text="Ready • Type to search documents",
-            font=ctk.CTkFont(family="Segoe UI", size=10, weight="bold"),
+            font=ctk.CTkFont(family="Segoe UI", size=12, weight="bold"),
             text_color=t["status_fg"],
             anchor="w",
-            padx=8,
-            pady=3
+            padx=10,
+            pady=4
         )
         self.status_lbl.pack(side="left")
 
@@ -531,7 +548,7 @@ class DocxDatabaseApp(ctk.CTk):
         self.theme_name = theme_key
         self.theme = get_theme(theme_key)
         t = self.theme
-        radius = t.get("corner_radius", 12)
+        radius = t.get("corner_radius", 14)
         btn_rad = 8 if radius > 0 else 0
 
         # 1. Appearance Mode
@@ -769,32 +786,13 @@ class DocxDatabaseApp(ctk.CTk):
             return
         self.current_query = new_text
 
-        # 1. Push immediate query into background search thread
+        # Push query directly into background search thread (Zero-flicker instant search)
         self._trigger_background_search()
 
-        # 2. Empty query: return instantly to library state
-        if not self.current_query:
-            self._is_typing = False
-            if self._typing_timer:
-                self.after_cancel(self._typing_timer)
-            return
-
-        # 3. User is actively typing
-        self._is_typing = True
-        self.results_view.show_loading("Searching repository in background...")
-        self.status_lbl.configure(text="Searching in background...")
-
-        # 4. Debounce display: when typing stops (300ms pause), show results
-        if self._typing_timer:
-            self.after_cancel(self._typing_timer)
-        self._typing_timer = self.after(300, self._on_typing_stopped)
-
-    def _on_typing_stopped(self):
-        self._is_typing = False
-        if self._latest_results and self._latest_results["query_id"] == self._query_counter:
-            self._commit_results_to_ui(self._latest_results)
+        if self.current_query:
+            self.status_lbl.configure(text="Searching repository...")
         else:
-            self.results_view.show_loading("Finalizing results...")
+            self.status_lbl.configure(text="Updating library...")
 
     def _on_background_search_done(self, query_id: int, results: list, total_cnt: int, elapsed: float):
         if query_id < self._latest_delivered_id:
@@ -808,8 +806,7 @@ class DocxDatabaseApp(ctk.CTk):
             "elapsed": elapsed
         }
 
-        if not self._is_typing:
-            self._commit_results_to_ui(self._latest_results)
+        self._commit_results_to_ui(self._latest_results)
 
     def _commit_results_to_ui(self, res_data: dict):
         results = res_data["results"]
@@ -957,7 +954,9 @@ class DocxDatabaseApp(ctk.CTk):
 
     def _on_change_theme(self, choice: str):
         choice_clean = choice.lower().strip()
-        if "glass" in choice_clean:
+        if "liquid" in choice_clean:
+            theme_key = "liquid_glass"
+        elif "glass" in choice_clean:
             theme_key = "glassy"
         elif "retro" in choice_clean:
             theme_key = "retro"
@@ -968,17 +967,19 @@ class DocxDatabaseApp(ctk.CTk):
         elif "system" in choice_clean:
             theme_key = "system"
         else:
-            theme_key = "glassy"
+            theme_key = "liquid_glass"
 
         self.config.data["theme"] = theme_key
         self.config.save()
         self.apply_theme(theme_key)
 
     def _step_rgb_lights(self):
+        """Relaxed, ambient breathing RGB wave for developer attribution badge."""
         if not getattr(self, "_rgb_running", False) or not self.winfo_exists():
             return
 
-        self._rgb_hue = (self._rgb_hue + 0.007) % 1.0
+        # Gentle, serene ambient pace (110ms interval, 0.005 step)
+        self._rgb_hue = (self._rgb_hue + 0.005) % 1.0
 
         # Dynamic rainbow RGB wave across LEDs
         led_colors = []
@@ -987,7 +988,7 @@ class DocxDatabaseApp(ctk.CTk):
             r, g, b = colorsys.hsv_to_rgb(h, 0.90, 1.0)
             led_colors.append(f"#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}")
 
-        # Text glow color (vibrant, luminous RGB)
+        # Developer text glow color (vibrant, luminous RGB)
         h_text = (self._rgb_hue + 0.06) % 1.0
         rt, gt, bt = colorsys.hsv_to_rgb(h_text, 0.70, 1.0)
         text_color = f"#{int(rt*255):02x}{int(gt*255):02x}{int(bt*255):02x}"
@@ -995,12 +996,11 @@ class DocxDatabaseApp(ctk.CTk):
         try:
             for dot, col in zip(self.rgb_leds, led_colors):
                 dot.configure(text_color=col)
-            self.rgb_badge.configure(border_color=led_colors[0])
             self.rgb_dev_lbl.configure(text_color=text_color)
         except Exception:
             pass
 
-        self._rgb_timer = self.after(45, self._step_rgb_lights)
+        self._rgb_timer = self.after(110, self._step_rgb_lights)
 
     def _on_close(self):
         self._rgb_running = False

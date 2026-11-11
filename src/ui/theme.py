@@ -1,10 +1,100 @@
 """Theme System for Dastavej Sanghralya.
-Supports Glassy (inspired by Spicetify Glassy / iOS Flow), Retro, Dark, Light, and System modes.
+Supports Liquid Glass (Apple HIG), Glassy (Spicetify smoked glass), Retro, Dark, Light, and System modes.
 """
 
 from typing import Dict, Any
 
 THEMES: Dict[str, Dict[str, Any]] = {
+    "liquid_glass": {
+        "name": "Liquid Glass",
+        "appearance_mode": "dark",
+        "desktop_bg": "#060a12",              # Deep Apple Space Glass void backdrop
+        "sidebar_bg": "#0c1322",              # Translucent floating crystal glass
+        "sidebar_border": "#1d2d47",          # Specular glass rim highlight
+        "titlebar_bg": "#121d33",             # Elevated crystal titlebar
+        "titlebar_fg": "#ffffff",             # Pure Apple white
+        "titlebar_visible": True,
+        "titlebar_icon": "🧊",
+        "brand_fg": "#ffffff",
+        "subbrand_fg": "#38bdf8",             # Apple Electric Sky Blue
+        "main_bg": "#09101d",                 # Crystal clear dark canvas
+        "main_border": "#18263e",
+        "search_frame_bg": "#0c1322",
+        "search_frame_border": "#1f304d",
+        "search_entry_bg": "#070c17",
+        "search_entry_fg": "#ffffff",         # Ultra clear, high contrast white
+        "search_entry_placeholder": "#8193b2",# Crisp readable slate
+        "search_entry_border": "#1f304d",
+        "search_entry_focus": "#0071e3",      # Apple signature blue focus ring
+        "btn_clear_bg": "#142138",
+        "btn_clear_fg": "#ffffff",
+        "btn_clear_border": "#243757",
+        "btn_clear_hover": "#1c2e4d",
+        "tabs_bg": "#09101d",
+        "tabs_selected": "#0071e3",           # Apple Liquid Blue active tab
+        "tabs_selected_hover": "#0a84ff",
+        "tabs_selected_fg": "#ffffff",
+        "tabs_unselected": "#142138",
+        "tabs_unselected_fg": "#94a3b8",
+        "tabs_unselected_hover": "#1c2e4d",
+        "menu_bg": "#142138",
+        "menu_fg": "#ffffff",
+        "menu_dropdown_bg": "#0c1322",
+        "menu_dropdown_fg": "#ffffff",
+        "menu_dropdown_hover": "#1c2e4d",
+        "status_bg": "#0c1322",
+        "status_fg": "#94a3b8",
+        "status_border": "#18263e",
+        "progress_color": "#0071e3",
+        "progress_bg": "#142138",
+        "results_bg": "#09101d",
+        "results_border": "#18263e",
+        "card_bg": "#0e1729",                 # Liquid Glass floating card surface
+        "card_border": "#1c2d49",             # Delicate specular rim
+        "card_hover_bg": "#15223a",           # Responsive hover glow
+        "card_hover_border": "#38bdf8",
+        "card_selected_bg": "#192947",         # Selected fluid glass
+        "card_selected_border": "#0071e3",
+        "card_selected_title_fg": "#ffffff",
+        "card_selected_path_fg": "#93c5fd",
+        "card_selected_meta_fg": "#38bdf8",
+        "card_title_fg": "#ffffff",           # Crisp legible white
+        "card_path_fg": "#7e91b0",
+        "card_meta_fg": "#94a3b8",
+        "card_badge_bg": "#0071e3",           # Apple Blue Pill Badge
+        "card_badge_fg": "#ffffff",
+        "card_badge_border": "#38bdf8",
+        "snippet_bg": "#070c17",
+        "snippet_border": "#1a2a44",
+        "snippet_fg": "#e2e8f0",
+        "preview_bg": "#09101d",
+        "preview_border": "#18263e",
+        "preview_title_fg": "#ffffff",
+        "preview_path_fg": "#7e91b0",
+        "preview_meta_bg": "#0c1322",
+        "preview_meta_fg": "#94a3b8",
+        "preview_meta_border": "#18263e",
+        "preview_text_bg": "#060b14",         # High legibility crystal reading well
+        "preview_text_fg": "#f8fafc",         # Bright, clear reading ink
+        "preview_text_border": "#18263e",
+        "preview_match_hl": "#0071e3",         # Electric blue highlighter
+        "preview_match_hl_fg": "#ffffff",
+        "btn_primary_bg": "#0071e3",          # Apple signature blue
+        "btn_primary_hover": "#0a84ff",
+        "btn_primary_fg": "#ffffff",
+        "btn_primary_border": "#38bdf8",
+        "btn_secondary_bg": "#142138",
+        "btn_secondary_hover": "#1c2e4d",
+        "btn_secondary_fg": "#ffffff",
+        "btn_secondary_border": "#243757",
+        "spinner_ring": "#38bdf8",
+        "spinner_track": "#142138",
+        "spinner_bg": "#09101d",
+        "spinner_glow": "#0071e3",
+        "spinner_text": "#94a3b8",
+        "corner_radius": 16,
+        "border_width": 1
+    },
     "glassy": {
         "name": "Glassy",
         "appearance_mode": "dark",
@@ -55,6 +145,9 @@ THEMES: Dict[str, Dict[str, Any]] = {
         "card_hover_border": "#443528",
         "card_selected_bg": "#3a2e23",
         "card_selected_border": "#e8b847",
+        "card_selected_title_fg": "#fff6e8",
+        "card_selected_path_fg": "#f3c95e",
+        "card_selected_meta_fg": "#e8b847",
         "card_title_fg": "#fff6e8",
         "card_path_fg": "#a39580",
         "card_meta_fg": "#cfc3ac",
@@ -142,6 +235,9 @@ THEMES: Dict[str, Dict[str, Any]] = {
         "card_hover_border": "#000080",
         "card_selected_bg": "#000080",
         "card_selected_border": "#000000",
+        "card_selected_title_fg": "#ffffff",
+        "card_selected_path_fg": "#ffff00",
+        "card_selected_meta_fg": "#d4d4d4",
         "card_title_fg": "#000000",
         "card_path_fg": "#555555",
         "card_meta_fg": "#444444",
@@ -229,6 +325,9 @@ THEMES: Dict[str, Dict[str, Any]] = {
         "card_hover_border": "#2b3e60",
         "card_selected_bg": "#142340",
         "card_selected_border": "#38bdf8",
+        "card_selected_title_fg": "#ffffff",
+        "card_selected_path_fg": "#38bdf8",
+        "card_selected_meta_fg": "#94a3b8",
         "card_title_fg": "#ffffff",
         "card_path_fg": "#64748b",
         "card_meta_fg": "#94a3b8",
@@ -316,6 +415,9 @@ THEMES: Dict[str, Dict[str, Any]] = {
         "card_hover_border": "#cbd5e1",
         "card_selected_bg": "#e0f2fe",
         "card_selected_border": "#0284c7",
+        "card_selected_title_fg": "#0369a1",
+        "card_selected_path_fg": "#0284c7",
+        "card_selected_meta_fg": "#475569",
         "card_title_fg": "#0f172a",
         "card_path_fg": "#64748b",
         "card_meta_fg": "#475569",
@@ -356,10 +458,12 @@ THEMES: Dict[str, Dict[str, Any]] = {
 }
 
 def get_theme(name: str) -> Dict[str, Any]:
-    """Returns the theme dictionary for a given name, defaulting to Glassy."""
+    """Returns the theme dictionary for a given name, defaulting to Liquid Glass."""
     key = (name or "").strip().lower()
     if key in THEMES:
         return THEMES[key]
+    if "liquid" in key:
+        return THEMES["liquid_glass"]
     if "glass" in key:
         return THEMES["glassy"]
     if "retro" in key:
@@ -369,6 +473,5 @@ def get_theme(name: str) -> Dict[str, Any]:
     if "light" in key:
         return THEMES["light"]
     if "system" in key:
-        return THEMES["glassy"]
-    return THEMES["glassy"]
-
+        return THEMES["liquid_glass"]
+    return THEMES["liquid_glass"]
